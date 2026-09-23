@@ -1,0 +1,6 @@
+{
+  "name": "Accounts Management System",
+  "description": "A full-scale professional accounting and ERP system replicating desktop workflow, with voucher screens (Journal, Cash/Bank Payment & Receipt, Contra, Reverse Bill, Provisions, Debit/Credit Notes), masters (Accounts, Group, TDS, Service Tax, BS/PL), and report viewers (Cash Book, General Ledger, Trial Balance, Profit & Loss, Balance Sheet, TDS/Sales Tax).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

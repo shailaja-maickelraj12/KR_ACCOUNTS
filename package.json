@@ -1,0 +1,11 @@
+{
+  "name": "kr-accounts-management-system",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "npm --prefix backend run start",
+    "build": "npm --prefix frontend run build"
+  }
+}
