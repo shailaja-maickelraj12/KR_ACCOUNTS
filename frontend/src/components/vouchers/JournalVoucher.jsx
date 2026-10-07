@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Plus, Trash, Check, AlertCircle, Printer, Edit2, X, RefreshCw, Download } from "lucide-react";
+import { generateNextVoucherNo, getVoucherShortDesc } from "../../utils/voucherNumbering";
 
 export default function JournalVoucher({ database, onSaveVoucher, onDeleteVoucher, onPrint }) {
   const [vouchersList, setVouchersList] = useState([]);
@@ -17,6 +18,7 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
   // Active Voucher states
   const [voucherId, setVoucherId] = useState("");
   const [voucherNo, setVoucherNo] = useState("");
+  const [shortDesc, setShortDesc] = useState("GENERAL JV");
   const [voucherDate, setVoucherDate] = useState(new Date().toISOString().split('T')[0]);
   const [billNo, setBillNo] = useState("");
   const [billDate, setBillDate] = useState(new Date().toISOString().split('T')[0]);
@@ -36,7 +38,7 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
 
   // Load vouchers from state
   useEffect(() => {
-    const jvs = (database.vouchers || []).filter(v => v.type === "JV");
+    const jvs = (database.vouchers || []).filter(v => v.type === "JV" || v.type === "JOURNAL" || v.type === "Journal");
     setVouchersList(jvs);
   }, [database]);
 
@@ -65,6 +67,7 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
   const loadVoucher = (v) => {
     setVoucherId(v.id);
     setVoucherNo(v.voucherNo);
+    setShortDesc(v.shortDesc || v.payload?.shortDesc || getVoucherShortDesc(v));
     setVoucherDate(v.voucherDate);
     setBillNo(v.billNo || "");
     setBillDate(v.billDate || v.voucherDate);
@@ -87,12 +90,9 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
   // Clear/Reset Form State
   const clearForm = () => {
     setVoucherId("");
-    // auto increment voucher number
-    const maxNo = vouchersList.reduce((max, current) => {
-      const parsed = parseInt(current.voucherNo);
-      return isNaN(parsed) ? max : Math.max(max, parsed);
-    }, 0);
-    setVoucherNo(String(maxNo + 1));
+    // Option 1 Standard: JV-00001, JV-00002 auto-generation
+    setVoucherNo(generateNextVoucherNo("JV", database.vouchers || []));
+    setShortDesc("GENERAL JV");
     setVoucherDate(new Date().toISOString().split('T')[0]);
     setBillNo("");
     setBillDate(new Date().toISOString().split('T')[0]);
@@ -168,6 +168,7 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
       billNo,
       billDate,
       type: "JV",
+      shortDesc: shortDesc || getVoucherShortDesc({ tdsEnabled, stEnabled, serviceTaxEnabled: seTaxEnabled }),
       narration: narration || filteredItems[0]?.narration || "",
       tdsEnabled,
       stEnabled,
@@ -316,13 +317,26 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
             <tbody className="divide-y divide-[#E2E8F0]">
               {vouchersList.map((v, index) => {
                 const firstLine = v.items?.[0] || {};
+                const desc = getVoucherShortDesc(v);
                 return (
                   <tr
                     key={v.id}
                     onClick={() => loadVoucher(v)}
                     className={`cursor-pointer ${index % 2 === 1 ? "bg-yellow-50" : "bg-white"} hover:bg-blue-50`}
                   >
-                    <td className="p-3 font-semibold text-slate-700">JOURNAL</td>
+                    <td className="p-3">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${
+                        desc === "WASTE SALE"
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          : desc === "TDS ADJ"
+                          ? "bg-purple-100 text-purple-800 border border-purple-200"
+                          : desc === "TAX ADJ"
+                          ? "bg-amber-100 text-amber-800 border border-amber-200"
+                          : "bg-slate-100 text-slate-700 border border-slate-200"
+                      }`}>
+                        {desc}
+                      </span>
+                    </td>
                     <td className="p-3 font-mono text-[#2563EB] font-bold">{v.voucherNo}</td>
                     <td className="p-3 font-mono text-slate-600">{v.voucherDate}</td>
                     <td className="p-3 font-semibold text-slate-800">{firstLine.accountName || v.narration || "Journal Voucher"}</td>
@@ -368,7 +382,7 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
         
         {/* Core Voucher Metadata Form */}
         <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 shadow-sm">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-[#1E293B]">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-xs font-semibold text-[#1E293B]">
             
             <div className="flex flex-col">
               <label className="text-[10px] uppercase font-bold text-[#64748B] mb-1">Voucher No</label>
@@ -376,8 +390,19 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
                 type="text" 
                 value={voucherNo} 
                 onChange={(e) => setVoucherNo(e.target.value)}
-                placeholder="e.g. 176"
+                placeholder="e.g. JV-00001"
                 className="p-2 border border-[#E2E8F0] bg-[#F8FAFC] font-mono rounded outline-none focus:ring-1 focus:ring-[#2563EB]"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-[10px] uppercase font-bold text-[#64748B] mb-1">Short Desc / Type</label>
+              <input 
+                type="text" 
+                value={shortDesc} 
+                onChange={(e) => setShortDesc(e.target.value)}
+                placeholder="e.g. GENERAL JV, WASTE SALE"
+                className="p-2 border border-[#E2E8F0] bg-[#F8FAFC] font-semibold text-[#2563EB] rounded outline-none focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
 

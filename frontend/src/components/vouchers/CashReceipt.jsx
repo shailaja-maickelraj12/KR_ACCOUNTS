@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Trash, Printer, Edit2, X, RefreshCw, Users, FileText } from "lucide-react";
+import { generateNextVoucherNo } from "../../utils/voucherNumbering";
 
 function numberToWords(num) {
   if (num === 0) return "ZERO ONLY";
@@ -104,11 +105,8 @@ export default function CashReceipt({ database, onSaveVoucher, onDeleteVoucher }
 
   const clearForm = () => {
     setVoucherId("");
-    const maxNo = vouchersList.reduce((max, current) => {
-      const parsed = parseInt(current.voucherNo);
-      return isNaN(parsed) ? max : Math.max(max, parsed);
-    }, 0);
-    setVoucherNo(String(maxNo + 1));
+    // Option 1 Standard: CR-00001, CR-00002
+    setVoucherNo(generateNextVoucherNo("CR", database.vouchers || []));
     setVoucherDate(new Date().toISOString().split('T')[0]);
     setBillNo("");
     setBillDate(new Date().toISOString().split('T')[0]);

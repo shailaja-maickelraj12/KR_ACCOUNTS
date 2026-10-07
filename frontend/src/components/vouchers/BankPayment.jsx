@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Plus, Trash, Printer, Edit2, X, RefreshCw, Mail, FileText, Send } from "lucide-react";
+import { generateNextVoucherNo } from "../../utils/voucherNumbering";
 
 function numberToWords(num) {
   if (num === 0) return "ZERO ONLY";
@@ -133,11 +134,8 @@ export default function BankPayment({ database, onSaveVoucher, onDeleteVoucher }
 
   const clearForm = () => {
     setVoucherId("");
-    const maxNo = vouchersList.reduce((max, current) => {
-      const parsed = parseInt(current.voucherNo);
-      return isNaN(parsed) ? max : Math.max(max, parsed);
-    }, 0);
-    setVoucherNo(String(maxNo + 1));
+    // Option 1 Standard: BP-00001, BP-00002
+    setVoucherNo(generateNextVoucherNo("BP", database.vouchers || []));
     setVoucherDate(new Date().toISOString().split('T')[0]);
     setBillNo("");
     setBillDate(new Date().toISOString().split('T')[0]);
