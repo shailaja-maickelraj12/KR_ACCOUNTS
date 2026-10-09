@@ -12,11 +12,23 @@ const port = Number(process.env.PORT || 6400);
 const shouldSync = String(process.env.DB_SYNC).toLowerCase() === "true";
 const shouldAlter = String(process.env.DB_ALTER).toLowerCase() === "true";
 
-///app.use(cors({
-    ///origin: 'https://krexports.org',
-   /// credentials: true
-///}));
-app.use(cors({ origin: process.env.CLIENT_URL || "https://krexports.org/" }));
+const allowedOrigins = [
+  "http://127.0.0.1:5173",
+  "http://localhost:5173",
+  "https://krexports.org",
+  process.env.CLIENT_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.some(o => origin.startsWith(o))) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow dev connections
+    }
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
@@ -38,8 +50,8 @@ const start = async () => {
     await sequelize.sync({ alter: shouldAlter });
   }
 
-  app.listen(port, () => {
-    console.log(`[ERP API] running on http://localhost:${port}`);
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`[ERP API] running on http://127.0.0.1:${port}`);
   });
 };
 

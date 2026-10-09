@@ -6,6 +6,8 @@ import voucherRoutes from "./voucherRoutes.js";
 import reportRoutes from "./reportRoutes.js";
 import tdsRoutes from "./tds.routes.js";
 import contraEntryRoutes from "./contraEntry.routes.js";
+import tallyRoutes from "./tallyRoutes.js";
+import invoiceRoutes from "./invoiceRoutes.js";
 
 const router = Router();
 
@@ -16,5 +18,7 @@ router.use(voucherRoutes);
 router.use(reportRoutes);
 router.use("/tds", tdsRoutes);
 router.use("/contra-entries", contraEntryRoutes);
+router.use("/tally", tallyRoutes);
+router.use("/external/invoices", invoiceRoutes);
 
 export default router;

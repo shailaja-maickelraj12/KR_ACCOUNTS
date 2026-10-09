@@ -1,7 +1,10 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
 
-dotenv.config({ quiet: true });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../.env"), quiet: true });
 
 const loggingEnabled = String(process.env.DB_LOGGING).toLowerCase() === "true";
 
