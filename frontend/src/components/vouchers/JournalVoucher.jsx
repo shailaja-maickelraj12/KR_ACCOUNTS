@@ -1,9 +1,37 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Plus, Trash, Check, AlertCircle, Printer, Edit2, X, RefreshCw, Download } from "lucide-react";
+import { Plus, Trash, Check, AlertCircle, Printer, Edit2, X, RefreshCw, Download, Send, Server, CheckCircle2, XCircle } from "lucide-react";
+import { getTallyStatus, postToTally, syncSalesInvoices } from "../../api/voucherApi.js";
 
 export default function JournalVoucher({ database, onSaveVoucher, onDeleteVoucher, onPrint }) {
   const [vouchersList, setVouchersList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSyncInvoices = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await syncSalesInvoices();
+      const data = res.data || res;
+      if (data.success) {
+        alert(`Successfully synced ${data.count || 0} invoice(s) from Sales Module!`);
+        window.location.reload();
+      } else {
+        alert(`Sync Notice: ${data.error || "Could not fetch invoices from Sales Module"}`);
+      }
+    } catch (err) {
+      alert(`Sync Notice: Could not connect to Sales Module server (${err.message}). Make sure local Sales Module server (port 5000) or ngrok is running.`);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Tally Integration States
+  const [isTallyModalOpen, setIsTallyModalOpen] = useState(false);
+  const [tallyStatus, setTallyStatus] = useState({ loading: false, reachable: false, company: null, error: null });
+  const [tallyTargetVoucher, setTallyTargetVoucher] = useState(null);
+  const [tallyDepartment, setTallyDepartment] = useState("Production");
+  const [tallyPosting, setTallyPosting] = useState(false);
+  const [tallyResult, setTallyResult] = useState(null);
   
   // Memoize account options for instant rendering with 5,000+ accounts
   const accountOptions = useMemo(() => {
@@ -144,6 +172,72 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
   const totalCredit = items.reduce((sum, item) => sum + (parseFloat(item.credit) || 0), 0);
   const difference = Math.abs(totalDebit - totalCredit);
   const isBalanced = difference < 0.01;
+
+  // Fetch Tally Status
+  const fetchTallyStatus = async () => {
+    setTallyStatus({ loading: true, reachable: false, company: null, error: null });
+    try {
+      const res = await getTallyStatus();
+      const data = res.data || res;
+      setTallyStatus({
+        loading: false,
+        reachable: !!data.reachable,
+        company: data.company || null,
+        error: data.error || null
+      });
+    } catch (err) {
+      setTallyStatus({
+        loading: false,
+        reachable: false,
+        company: null,
+        error: err.response?.data?.error || err.message || "Tally unreachable"
+      });
+    }
+  };
+
+  // Open Tally Preview Modal
+  const openTallyModal = (v = null) => {
+    const target = v || {
+      id: voucherId,
+      voucherNo,
+      voucherDate,
+      narration,
+      items: items.filter(it => it.accountCode || it.accountName)
+    };
+    
+    if (!target.voucherNo) {
+      alert("Please enter a valid Voucher Number before posting to Tally.");
+      return;
+    }
+
+    setTallyTargetVoucher(target);
+    setTallyResult(null);
+    setIsTallyModalOpen(true);
+    fetchTallyStatus();
+  };
+
+  // Execute Post to Tally
+  const handlePostToTally = async () => {
+    if (!tallyTargetVoucher) return;
+    setTallyPosting(true);
+    setTallyResult(null);
+
+    try {
+      const res = await postToTally({
+        voucher: tallyTargetVoucher,
+        department: tallyDepartment
+      });
+      const data = res.data || res;
+      setTallyResult(data);
+    } catch (err) {
+      setTallyResult({
+        success: false,
+        error: err.response?.data?.error || err.message || "Failed to post voucher to Tally"
+      });
+    } finally {
+      setTallyPosting(false);
+    }
+  };
 
   // Save Voucher Action
   const handleSave = () => {
@@ -291,12 +385,23 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#1E293B]">Journal Voucher Register</h3>
           <p className="text-[10px] text-[#64748B] mt-1">Select a row to update it, or add a new voucher from the button.</p>
         </div>
-        <button
-          onClick={openNewVoucher}
-          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" /> Add Journal Voucher
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSyncInvoices}
+            disabled={isSyncing}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            title="Fetch and sync new invoices from local Sales Module server"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+            {isSyncing ? "Syncing..." : "Sync Sales Invoices"}
+          </button>
+          <button
+            onClick={openNewVoucher}
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2 rounded text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Add Journal Voucher
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 min-h-0">
@@ -310,7 +415,7 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
                 <th className="p-3 bg-slate-50">Account Name</th>
                 <th className="p-3 text-right w-32 bg-slate-50">Debit</th>
                 <th className="p-3 w-28 bg-slate-50">UserName</th>
-                <th className="p-3 text-center w-24 bg-slate-50">Actions</th>
+                <th className="p-3 text-center w-36 bg-slate-50">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2E8F0]">
@@ -337,6 +442,13 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
                         </button>
                         <button onClick={(e) => { e.stopPropagation(); triggerPrint(v.id); }} className="text-slate-500 hover:text-slate-800 cursor-pointer" title="Print">
                           <Printer className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); openTallyModal(v); }}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer"
+                          title="Post to Tally"
+                        >
+                          <Send className="w-3 h-3" /> Tally
                         </button>
                       </div>
                     </td>
@@ -687,9 +799,16 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
                 onClick={() => handleDownloadVoucher({ voucherNo, voucherDate, narration, items })}
                 className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded text-xs font-semibold flex items-center gap-1 cursor-pointer"
               >
-                <Download className="w-4 h-4" /> Download Voucher
+                <Download className="w-4 h-4" /> Download
                 </button>
               )}
+              <button 
+                onClick={() => openTallyModal()}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                title="Post to Tally"
+              >
+                <Send className="w-4 h-4" /> Post to Tally
+              </button>
             </div>
 
           </div>
@@ -699,72 +818,172 @@ export default function JournalVoucher({ database, onSaveVoucher, onDeleteVouche
         </div>
       </div>
 
-      {/* RIGHT: Quick-Voucher Find Sidebar & Logs (reproducing Page 1 list view) */}
-      <div className="hidden" id="jv-entry-vouchers-list">
-        
-        <div className="flex justify-between items-center mb-3">
-          <h4 className="font-bold text-[#1E293B] text-[11px] uppercase tracking-wider">
-            Historic JVs ({vouchersList.length})
-          </h4>
-          <button onClick={clearForm} title="Reset Form for entry" className="text-[#2563EB] hover:text-[#1D4ED8] cursor-pointer">
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-        </div>
+      {/* Tally Integration Preview Modal */}
+      {isTallyModalOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0F172A]/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-2xl max-w-2xl w-full p-6 flex flex-col gap-4">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Send className="w-5 h-5 text-emerald-600" />
+                <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">Post Journal Voucher to Tally</h3>
+              </div>
+              <button onClick={() => setIsTallyModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-        <div className="flex flex-col gap-3">
-          {vouchersList.map(v => {
-            const hasDraft = v.id === voucherId;
-            return (
-              <div 
-                key={v.id} 
-                onClick={() => loadVoucher(v)}
-                className={`p-3 rounded-lg border text-xs cursor-pointer transition-all ${
-                  hasDraft 
-                    ? "bg-[#EFF6FF] border-[#2563EB]" 
-                    : "bg-white hover:bg-[#F8FAFC] border-[#E2E8F0]"
+            {/* Tally Reachability / Open Company Status */}
+            <div className={`p-3 rounded-lg border text-xs flex items-center justify-between ${
+              tallyStatus.loading ? "bg-slate-50 border-slate-200 text-slate-600" :
+              tallyStatus.reachable ? "bg-emerald-50 border-emerald-200 text-emerald-800" :
+              "bg-rose-50 border-rose-200 text-rose-800"
+            }`}>
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4" />
+                <span className="font-semibold">
+                  {tallyStatus.loading ? "Checking Tally connection..." :
+                   tallyStatus.reachable ? `Tally Reachable — Company: ${tallyStatus.company}` :
+                   `Tally Unreachable (${tallyStatus.error || "Connection failed"})`}
+                </span>
+              </div>
+              <button onClick={fetchTallyStatus} className="text-slate-500 hover:text-slate-700 underline text-[11px] cursor-pointer">
+                Refresh Status
+              </button>
+            </div>
+
+            {/* Voucher Info & Department */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Voucher Date</label>
+                <input
+                  type="date"
+                  value={tallyTargetVoucher?.voucherDate || ""}
+                  onChange={(e) => setTallyTargetVoucher(prev => ({ ...prev, voucherDate: e.target.value }))}
+                  className="p-2 border border-slate-200 rounded text-xs font-mono font-semibold outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Tip: In Tally Demo/Edu mode, use the 1st or 2nd (e.g. 2026-09-01).
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Department</label>
+                <select
+                  value={tallyDepartment}
+                  onChange={(e) => setTallyDepartment(e.target.value)}
+                  className="p-2 border border-slate-200 rounded text-xs font-semibold outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                >
+                  <option value="Production">Production</option>
+                  <option value="Administration">Administration</option>
+                  <option value="Sales">Sales</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Stores">Stores</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="">(None)</option>
+                </select>
+                <p className="text-[10px] text-slate-400 truncate">
+                  Prefix: <span className="font-mono text-slate-600">{tallyDepartment ? `[${tallyDepartment}] ` : ''}{tallyTargetVoucher?.narration || ''}</span>
+                </p>
+              </div>
+            </div>
+
+
+            {/* Ledger Lines & Totals Preview */}
+            <div className="border border-slate-200 rounded-lg overflow-hidden">
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px]">
+                    <th className="p-2">Account Head</th>
+                    <th className="p-2 text-right">Debit (Dr.)</th>
+                    <th className="p-2 text-right">Credit (Cr.)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {(tallyTargetVoucher?.items || []).filter(it => it.accountName || it.accountCode).map((it, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50">
+                      <td className="p-2 font-semibold text-slate-800">{it.accountName || it.accountCode}</td>
+                      <td className="p-2 text-right font-mono font-semibold text-slate-700">
+                        {parseFloat(it.debit) > 0 ? parseFloat(it.debit).toFixed(2) : "-"}
+                      </td>
+                      <td className="p-2 text-right font-mono font-semibold text-slate-700">
+                        {parseFloat(it.credit) > 0 ? parseFloat(it.credit).toFixed(2) : "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-slate-100 font-bold border-t border-slate-200 text-slate-800">
+                    <td className="p-2">Total</td>
+                    <td className="p-2 text-right font-mono">
+                      {(tallyTargetVoucher?.items || []).reduce((sum, i) => sum + (parseFloat(i.debit) || 0), 0).toFixed(2)}
+                    </td>
+                    <td className="p-2 text-right font-mono">
+                      {(tallyTargetVoucher?.items || []).reduce((sum, i) => sum + (parseFloat(i.credit) || 0), 0).toFixed(2)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            {/* Tally Execution Result Feedback */}
+            {tallyResult && (
+              <div className={`p-3 rounded-lg border text-xs flex flex-col gap-1 ${
+                tallyResult.success ? "bg-emerald-50 border-emerald-200 text-emerald-900" : "bg-rose-50 border-rose-200 text-rose-900"
+              }`}>
+                <div className="flex items-center gap-1.5 font-bold">
+                  {tallyResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <XCircle className="w-4 h-4 text-rose-600" />}
+                  <span>{tallyResult.success ? tallyResult.message : (tallyResult.error || "Posting failed")}</span>
+                </div>
+
+                {tallyResult.createdLedgers && tallyResult.createdLedgers.length > 0 && (
+                  <div className="mt-1 pt-1 border-t border-slate-200/60">
+                    <span className="font-bold text-[10px] uppercase tracking-wider">Auto-Created / Verified Ledgers:</span>
+                    <ul className="list-disc list-inside text-[11px] font-mono mt-0.5 space-y-0.5">
+                      {tallyResult.createdLedgers.map((leg, i) => (
+                        <li key={i}>{leg}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Confirm Action Button */}
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                onClick={() => setIsTallyModalOpen(false)}
+                className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-4 py-2 rounded text-xs font-semibold cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                onClick={handlePostToTally}
+                disabled={tallyPosting || !tallyStatus.reachable}
+                className={`px-5 py-2 rounded text-xs font-semibold flex items-center gap-1.5 ${
+                  tallyPosting || !tallyStatus.reachable
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
                 }`}
               >
-                <div className="flex justify-between items-center mb-1.5 font-bold">
-                  <span className="text-[#2563EB] font-serif">VouNo: {v.voucherNo}</span>
-                  <span className="text-[#64748B] font-mono">{v.voucherDate}</span>
-                </div>
-                <div className="text-slate-600 font-medium line-clamp-2 leading-relaxed mb-2">
-                  {v.narration || "No memo text available."}
-                </div>
-                <div className="flex justify-between items-center text-[10px]">
-                  <span className="bg-[#DCFCE7] text-[#166534] uppercase text-[9px] font-bold px-1.5 rounded">
-                    Rs. {v.totalAmount.toLocaleString("en-IN")}
-                  </span>
-                  <span className="text-slate-400 font-bold uppercase">🧑 {v.userName}</span>
-                </div>
-                
-                {/* Print button directly on item card */}
-                <div className="mt-2 pt-2 border-t border-slate-100 flex justify-end gap-2">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); triggerPrint(v.id); }}
-                    className="p-1 text-slate-400 hover:text-slate-700 flex items-center gap-1 font-bold text-[9px]"
-                  >
-                    <Printer className="w-3 h-3" /> PRINT BILL
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleDownloadVoucher(v); }}
-                    className="p-1 text-slate-400 hover:text-teal-600 flex items-center gap-1 font-bold text-[9px]"
-                  >
-                    <Download className="w-3 h-3" /> DL VOUCHER
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-
-          {vouchersList.length === 0 && (
-            <div className="p-8 text-center text-slate-400 text-xs">
-              No registered JV. Start entering above.
+                {tallyPosting ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    Posting to Tally...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    Post to Tally
+                  </>
+                )}
+              </button>
             </div>
-          )}
-        </div>
 
-      </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -4,3 +4,7 @@ export const saveVoucher = (data) => api.post("/vouchers", data);
 export const deleteVoucher = (id) => api.delete(`/vouchers/${id}`);
 export const saveReverseBill = (data) => api.post("/reverse-bills", data);
 export const deleteReverseBill = (id) => api.delete(`/reverse-bills/${id}`);
+
+export const getTallyStatus = () => api.get("/tally/status");
+export const postToTally = (data) => api.post("/tally/post-voucher", data);
+export const syncSalesInvoices = (salesApiUrl) => api.post("/external/invoices/fetch-sync", { salesApiUrl });
