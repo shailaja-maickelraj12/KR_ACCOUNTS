@@ -1,0 +1,990 @@
+=== PAGE 1 ===
+ACADEMIC MANAGEMENT SYSTEM 
+ 
+23CS54C – MODERN WEB TECHNOLOGIES 
+ 
+Submitted by 
+ 
+ 
+JOEL A 2312053 
+SARAVANA KUMAR B 2312061 
+RAM PRASATH M 2312063 
+ 
+In partial fulfillment for the award of the degree  
+of  
+BACHELOR OF ENGINEERING/TECHNOLOGY 
+in 
+COMPUTER SCIENCE AND ENGINEERING/ INFORMATION 
+TECHNOLOGY 
+ 
+ 
+ 
+ 
+NATIONAL ENGINEERING COLLEGE 
+(An Autonomous Institution affiliated to Anna University, Chennai) 
+ 
+K.R.NAGAR, KOVILPATTI - 628503 
+OCTOBER - 2025 
+ 
+
+
+=== PAGE 2 ===
+ 
+1 
+ 
+NATIONAL ENGINEERING COLLEGE 
+(An Autonomous Institution affiliated to Anna University, Chennai) 
+K.R.NAGAR, KOVILPATTI - 628503 
+ 
+ 
+ 
+ 
+BONAFIDE CERTIFICATE 
+ 
+This is to certify that this project report, “Academic Management System”, 
+is the bonafide work of JOEL A (2312053)  , SARAVANA KUMAR B 
+(2312061), RAM PRASATH M (2312063)  who carried out the project work 
+under my supervision. 
+ 
+ 
+   Course Instructor/Guide 
+ 
+Submitted to the 23CS54C – MODERN WEB TECHNOLOGIES Viva-Voce 
+examination held at National Engineering College, K.R.Nagar, Kovilpatti on 
+___________ 
+ 
+ 
+Internal Examiner       Co Examiner 
+
+
+=== PAGE 3 ===
+ 
+2 
+ 
+TABLE OF CONTENTS 
+ 
+ 
+CH NO TITLE PAGE NO 
+1 INTRODUCTION 3 
+2 OBJECTIVES 4 
+3  DESCRIPTION 5 
+4 CLASS DIAGRAM 6 
+5  TABLE STRUCTURES 7 
+6 ER DIAGRAM 11 
+7  TECH STACK 12 
+8 MODULES 13 
+9 CONCLUSION 41 
+  
+
+=== PAGE 4 ===
+ 
+3 
+ 
+CHAPTER 1 
+INTRODUCTION 
+ 
+The Learning Management System (LMS) is a web -based application developed to 
+manage and organize courses, staff, and student allocations digitally. It is designed to replace 
+traditional manual methods of tracking course assignments and attendance in educat ional 
+institutions. The system provides multiple types of users: Admin, Staff, and Attendance Admin, 
+each having specific roles and access privileges. 
+The Admin can add, update, delete, and manage staff, students, courses, and their 
+allocations. The Admin can also monitor the overall course assignments and generate reports 
+on staff and student engagement. The Staff can view the courses assigned to them, manage 
+course materials, and track student progress. The Attendance Admin can record and monitor 
+student attendance, generate attendance reports, and notify relevant staff about attendance 
+issues. 
+The system helps maintain accurate course and attendance records, reduces human 
+error, and saves time. It also enhances organization and transparency by controlling who can 
+access and update course and attendance information. The user -friendly interface ensures that 
+Admin, Staff, and Attendance Admin can efficiently use the system. This system is useful for 
+schools, colleges, and training institutions to handle courses, staff, and students in a more 
+organized and efficient manner. 
+ 
+ 
+ 
+ 
+ 
+ 
+
+=== PAGE 5 ===
+ 
+4 
+ 
+CHAPTER 2 
+OBJECTIVES 
+ 
+• To provide role-based authentication and authorization ensuring secure access control 
+for each user type (Admin, Staff, Attendance Admin). 
+• To maintain a centralized database for storing all user, course, and attendance details 
+efficiently. 
+• To enable real-time data updates across all user dashboards when new records are added 
+or modified. 
+• To allow Admins to assign roles and privileges dynamically to users. 
+• To generate detailed analytical reports for student performance, attendance trends, and 
+staff activity. 
+• To implement a search and filter feature for quickly locating students, staff, or course 
+details. 
+• To allow Staff members to update student marks, grades, or progress in their respective 
+courses. 
+• To allow Attendance Admins to download attendance reports in formats like PDF or 
+Excel. 
+• To ensure data validation and error handling to maintain data accuracy and prevent 
+duplication. 
+• To provide a user -friendly and responsive interface for smooth navigation across all 
+modules. 
+• To implement secure password management and support for password reset or account 
+recovery. 
+• To provide backup and restore functionality to protect important institutional data. 
+ 
+ 
+ 
+
+=== PAGE 6 ===
+ 
+5 
+ 
+CHAPTER 3 
+DESCRIPTION 
+ 
+The Learning Management System (LMS) is a web -based application designed to manage 
+courses, staff, and student allocations efficiently within an educational institution. The system 
+includes multiple types of users: Admin, Staff, and Attendance Admin. The A dmin has the 
+ability to add, update, and delete staff, students, and courses, as well as monitor course 
+assignments and track student progress. All information is stored securely in a database for 
+easy access and management. 
+The Staff can log in to view the courses assigned to them and the students enrolled, and can 
+manage course materials and track student performance. The Attendance Admin can record 
+and manage student attendance and generate reports. The system ensures secure access through 
+a login page and provides a user-friendly interface for all users. This project helps in reducing 
+manual work, improving accuracy, and maintaining organized digital records of courses, staff, 
+and student information. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+=== PAGE 7 ===
+ 
+6 
+ 
+CHAPTER 4 
+CLASS DIAGRAM 
+ 
+ 
+ 
+ 
+
+
+=== PAGE 8 ===
+ 
+7 
+ 
+CHAPTER 5 
+TABLE STRUCTURES 
+Users 
+ 
+Student Details 
+ 
+
+
+=== PAGE 9 ===
+ 
+8 
+ 
+ 
+Batch 
+ 
+Courses 
+ 
+
+
+=== PAGE 10 ===
+ 
+9 
+ 
+Department 
+ 
+ 
+Semester 
+ 
+ 
+Student-Course 
+ 
+ 
+ 
+ 
+
+
+=== PAGE 11 ===
+ 
+10 
+ 
+Regulation 
+ 
+Attendance 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+=== PAGE 12 ===
+ 
+11 
+ 
+CHAPTER 6 
+ER DIAGRAM 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+=== PAGE 13 ===
+ 
+12 
+ 
+CHAPTER 7 
+TECH STACK 
+ 
+Frontend Technologies: React.js, Vite, Tailwind CSS 
+Backend Technologies: Node.js, Express.js 
+Middleware: Authentication Middleware, File Upload Middleware, CORS Middleware, Body 
+Parser 
+Database: MySQL 
+Approach: Hybrid ORM and Raw Queries, Async/Await Programming, RESTful API Design, 
+Modular Architecture 
+Architecture: MVC (Model-View-Controller) 
+• Models: Sequelize models representing database entities (User, Student, Staff, Events, 
+etc.) 
+• Views: React components handling UI rendering and user interactions 
+• Controllers: Express route handlers managing business logic and API responses 
+ 
+ 
+ 
+ 
+ 
+ 
+
+=== PAGE 14 ===
+ 
+13 
+ 
+CHAPTER 8 
+MODULES 
+8.1 FOLDER STRUCTURE 
+BACKEND FOLDER STRUCTURE 
+ 
+Fig 8.1 – Backend Folder Structure – Overall organization of backend files and directories 
+showing modular architecture. 
+
+
+=== PAGE 15 ===
+ 
+14 
+ 
+ 
+Fig 8.2 – Backend Routes – Defined RESTful API routes connecting client requests to 
+backend controllers. 
+In a Node.js and Express-based application, the routes, services, and controllers together form 
+the backbone of the backend architecture, ensuring modularity, readability, and maintainability 
+of the code. Routes define the various endpoints (URLs) through which clients can interact 
+with the server. Each route corresponds to a specific function or action, such as creating, 
+reading, updating, or deleting data. The route file mainly handles HTTP methods like GET, 
+POST, PUT, and DELETE, and it connects the inco ming client requests to the appropriate 
+controller functions. 
+
+
+=== PAGE 16 ===
+ 
+15 
+ 
+Controllers act as the link between the routes and the business logic. They contain the actual 
+logic that processes the incoming requests, interacts with the service or database layer, and 
+sends the appropriate response back to the client. Controllers help in keeping  the route files 
+clean and focus solely on handling business operations such as validating inputs, managing 
+data flow, and formatting responses. 
+Services form the business logic layer that handles complex operations like data processing, 
+calculations, or communication with the database using ORM (like Sequelize) or raw queries. 
+By placing these operations in the service layer, the controller remains lightw eight and easier 
+to maintain. Services also make the code reusable across multiple controllers since they 
+encapsulate specific functionalities like user authentication, record management, or file 
+handling. 
+Together, routes, controllers, and services create a well -structured and scalable application 
+where each layer has a specific responsibility —routes for handling requests, controllers for 
+managing logic, and services for executing core operations efficiently. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+=== PAGE 17 ===
+ 
+16 
+ 
+ 
+FRONTEND FOLDER STRUCTURE: 
+ 
+Fig 8.3 – Frontend Folder Structure – Layout of React-based frontend directories with 
+components and pages.
+
+
+=== PAGE 18 ===
+ 
+17 
+ 
+ 
+Fig 8.4 – Admin Pages – Admin-side pages for managing courses, staff, and student data.
+
+
+=== PAGE 19 ===
+ 
+18 
+ 
+ 
+Fig 8.5 – Staff and Student Pages – Interfaces designed separately for staff 
+and student users. 
+The College ERP application is built with a clear separation of concerns, featuring a Backend 
+API Server and a Frontend User Interface. This architecture is standard for modern web 
+applications and promotes modularity, independent development, and scalability. 
+1. Backend API Server Module 
+The backend, located in the College-Integration/College/backend directory, handles all server-
+side logic, data management, and security. It is likely a Node.js/Express application. 
+
+
+=== PAGE 20 ===
+ 
+19 
+ 
+• API Routing (routes): 
+o Purpose: Defines and manages all the REST API endpoints that the frontend 
+uses to communicate with the server. 
+o Key Feature: Routes are logically segregated into sub-modules like admin, auth, 
+staff, and student to manage access control and specific resource paths (e.g., 
+studentRoutes.js). 
+• Business Logic (controllers): 
+o Purpose: Executes the core business logic and feature implementations for each 
+incoming API request. 
+o Key Feature: This module handles data validation, orchestrates interactions with 
+the database, and ensures application rules are enforced before data is 
+manipulated. 
+• Database Module (db.js, seedData.js): 
+o Purpose: Manages the connection and configuration for the application's 
+persistent data store. 
+o Key Feature: The db.js file establishes the connection, while seedData.js is used 
+to populate the database with initial, essential records for testing or setup. 
+• Utilities (utils): 
+o Purpose: Provides a library of reusable helper functions used across the server. 
+o Key Feature: Includes functions for tasks like logging, data formatting, 
+encryption, and general error handling, promoting the Don't Repeat Yourself 
+(DRY) principle. 
+• Server Core (server.js, app.js, config.env): 
+o Purpose: Contains the main application entry point and configuration. 
+o Key Feature: server.js initializes the server, loads environment variables from 
+
+=== PAGE 21 ===
+ 
+20 
+ 
+config.env, and starts listening for client requests. 
+2. Frontend User Interface Module 
+The frontend, found in the College -Integration/frontend/src directory, is a user-facing Single-
+Page Application (SPA), most likely built with React, responsible for presentation and 
+interaction. 
+• Pages & Views (pages): 
+o Purpose: Contains the major top -level components that define the unique 
+screens or views of the application. 
+o Key Feature: Examples include full views like the Student Dashboard, the Login 
+Screen, or a Course Registration page. 
+• UI Components (components): 
+o Purpose: Houses small, reusable user interface elements used throughout the 
+application. 
+o Key Feature: These are the building blocks of the UI, such as custom Buttons, 
+Form Inputs, Navigation Bars, and Cards, promoting UI consistency. 
+• Services (services): 
+o Purpose: Centralizes the logic for making API calls to the backend server. 
+o Key Feature: It abstracts the HTTP request details (e.g., managing request 
+headers and error handling) from the presentation components. 
+• Routing (routes.jsx): 
+o Purpose: Manages the client-side navigation and mapping of URLs to specific 
+page components. 
+o Key Feature: Defines the application's flow, including which routes are public 
+and which require user authentication (protected routes). 
+• Layouts (layouts): 
+
+=== PAGE 22 ===
+ 
+21 
+ 
+o Purpose: Defines common structural wrappers applied to groups of pages. 
+o Key Feature: Ensures a consistent look by providing a standardized structure 
+(e.g., a shared header, sidebar, and footer) that wraps the page content. 
+ 
+ADMIN DASHBOARD 
+ 
+ 
+Fig 8.6 – Admin Dashboard – Displaying All – Dashboard summarizing semesters, 
+courses, staff, and students. 
+The Admin Dashboard is designed to help manage the institution efficiently by providing a 
+structured and user -friendly interface. The layout is divided into three main sections — the 
+header and navigation sidebar, key metric cards, and management panels co ntaining essential 
+administrative functions. 
+At the top, the page header displays the title “Admin Dashboard” along with the subtitle 
+“Manage your institution efficiently”, giving users a clear understanding of the page’s purpose. 
+On the left side, the navigation sidebar offers quick access to variou s modules such as 
+Dashboard, Manage Semesters, Manage Regulations, Allocate Regulation to Batch, Manage 
+Courses, Allocate Staff to Course, Allocate Students to Staff, Timetable, and Consolidated 
+Marks (partially visible). The currently active section is the Dashboard itself. 
+
+
+=== PAGE 23 ===
+ 
+22 
+ 
+The central part of the page contains key metric cards that provide a quick statistical summary 
+of institutional data, including 16 Semesters, 28 Courses, 3 Staff members, and 105 Students. 
+These metrics allow the admin to monitor academic data at a glance. 
+Below the metrics, the management options section presents essential action buttons that enable 
+administrators to perform core operations like Edit Semester, Create Course, View Courses, 
+Allocate Course, Add Staff, View Staff, Allocate Staff, Add Student, and View Students. These 
+options simplify the day-to-day management of academic and administrative activities. 
+Additionally, the Quick Actions section provides shortcuts to frequently used tasks. Prominent 
+blue buttons labeled New Semester and New Course allow rapid data entry, while partially 
+visible buttons for Staff Allocation and Student Allocation offer direct  navigation to key 
+configuration pages. 
+Finally, the Recent Semesters section lists the most recently created or active semesters, such 
+as BE CSE Sem 2 (2023) and BTech CSE Sem 1 (2023), helping administrators easily track 
+ongoing academic periods. Overall, the Admin Dashboard offers a centralized, organized, and 
+efficient way to manage institutional information and operations 
+ 
+Manage Semester 
+ 
+Fig 8.7 – Manage Semesters Page – Interface for creating and managing semester records. 
+
+
+=== PAGE 24 ===
+ 
+23 
+ 
+ 
+The Manage Semesters page is designed to help administrators efficiently create, organize, and 
+maintain semester details for various departments and batches. The top section of the page 
+features the page title, “Manage Semesters”, along with the subtitle “ Create and manage 
+semesters for different batches and departments”, clearly describing the purpose of the page. 
+On the right-hand side of the header, there is a prominent “+ Add Semester” button highlighted 
+in blue, serving as the primary call to action for creating a new semester entry. 
+Below the header, the Find Semesters section enables users to filter and search for existing 
+semesters based on specific criteria. It includes several input controls such as a Degree 
+dropdown (defaulted to All Degrees), a Batch Year input field (for exampl e, 2023), a Branch 
+dropdown (defaulted to All Branches), and a Semester dropdown (defaulted to All Semesters). 
+These filtering tools make it easy for administrators to quickly locate or manage semesters for 
+specific academic programs, departments, or years , ensuring a smooth and organized data 
+management experience. 
+ 
+Manage Regulations 
+ 
+Fig 8.8 – Manage Regulations Page – Module for importing and configuring academic 
+regulations. 
+ 
+
+
+=== PAGE 25 ===
+ 
+24 
+ 
+The Manage Regulations page provides administrators with tools to organize and manage 
+academic regulations efficiently while allowing the import and configuration of related 
+courses. At the top of the page, the header displays the title “Manage Regulations” along with 
+the subtitle “Import courses and manage verticals for regulations”, clearly describing the page’s 
+purpose. On the top right corner, there is a prominent “+ Add Vertical” button in blue, which 
+serves as the main action for creating a new vertic al or stream of courses under a specific 
+regulation. 
+Below the header, the Selection/Filtering Controls section enables administrators to specify the 
+department and regulation context they wish to manage. The Department dropdown allows 
+users to choose from various departments such as Computer Science Enginee ring (CSE), 
+Electronics & Communication (ECE), Mechanical Engineering (MECH), Information 
+Technology (IT), Electrical Engineering (EEE), Artificial Intelligence and Data Science 
+(AIDS), and Civil Engineering (CIVIL), with Select Department highlighted as t he default 
+option. Similarly, the Regulation dropdown lets users pick a specific academic regulation, with 
+Select Regulation shown as the default state. 
+The Course Import Section provides functionality to upload and manage course data associated 
+with the selected regulation. It includes an instruction message stating “Click to upload or drag 
+and drop XLS or XLSX files only”, indicating that the system accepts only spreadsheet files in 
+these formats for importing course information. To ensure data accuracy, there are two key 
+buttons — “Download Template”, which allows users to download a predefined file format to 
+maintain consistency during uploads, and “Import Courses”, which processes and imports the 
+course data from the selected file. 
+Overall, the Manage Regulations page combines filtering, configuration, and data import 
+features to streamline the management of academic regulations and their associated course 
+structures. 
+ 
+ 
+ 
+ 
+
+=== PAGE 26 ===
+ 
+25 
+ 
+Staff Course Allocation 
+ 
+ 
+Fig 8.9 – Staff Course Allocation Page – Page for assigning and managing staff course 
+responsibilities. 
+ 
+The Manage Staff page is designed to help administrators efficiently handle staff details and 
+their corresponding course allocations. At the top of the page, the header displays the title 
+“Manage Staff” along with the subtitle “Efficiently manage staff mem bers and their course 
+allocations.” This section clearly defines the purpose of the page and provides a structured 
+starting point for managing teaching assignments within the institution. 
+Beneath the header, the Search and Filtering Controls section enables users to locate and 
+organize staff information based on multiple criteria. It includes a Search by Name input field 
+with the placeholder “Enter staff name...”, allowing quick identificat ion of a specific staff 
+member. Additionally, there are several dropdown filters for refined searching, such as 
+Department (defaulted to All Departments), Semester (defaulted to All Semesters), Batch 
+(defaulted to All Batches), and Sort By, which is curren tly set to Staff ID. These filtering 
+options provide flexibility in viewing staff data, ensuring that administrators can easily access 
+and manage course allocations according to different academic and departmental needs. 
+ 
+
+
+=== PAGE 27 ===
+ 
+26 
+ 
+Student Staff Allocation 
+ 
+ 
+Fig 8.10 – Student Staff Allocation Page – Interface for allocating students to respective 
+staff members. 
+ 
+The Manage Students page provides a centralized interface for administrators to manage 
+student enrollments and allocate them to respective staff members. At the top of the page, the 
+header displays the title “Manage Students” along with the subtitle “Search, filter, and manage 
+student enrollments.” This section defines the purpose of the page, emphasizing its role in 
+maintaining organized student-to-staff course assignments. 
+Below the header, the Search and Filtering Controls section allows users to refine the displayed 
+student list using various parameters. The Search Bar includes the placeholder text “Search by 
+name or roll number...”, enabling quick lookups of specific stud ents. The filters include 
+Department, which is currently set to Computer Science Engineering; Semester, which is set 
+to Semester 1; and Batch, displayed as 2023 (2023 –2027). These filters ensure that 
+administrators can view and manage only the relevant group of students for a specific academic 
+session or department. 
+The main section of the page, the Students List and Allocation Table, displays all enrolled 
+students and their respective course allocations. At the top of this section, the total Student 
+
+
+=== PAGE 28 ===
+ 
+27 
+ 
+Count is shown as Students (103), providing an overview of the number of records currently 
+listed. The table structure includes the students’ key details such as their names and roll 
+numbers in the first two columns, followed by additional columns represen ting courses to 
+which each student can be assigned under specific staff members. This structure offers a clear 
+and interactive layout for managing student allocations efficiently within the academic system. 
+ 
+Time Table 
+ 
+ 
+Fig 8.11 – Timetable Management Page – Section for creating and viewing class 
+timetables. 
+ 
+The Timetable Management page is designed to help administrators and faculty efficiently 
+manage and view class schedules for different departments, batches, and semesters. At the top 
+of the page, the header displays the title “Timetable Management” with an implied subtitle that 
+indicates the primary purpose of the page — “Manage and view class schedules.” This section 
+provides a clear context for the user, highlighting that the page serves as a central hub for 
+creating, updating, and reviewing academic timetables. 
+ 
+
+
+=== PAGE 29 ===
+ 
+28 
+ 
+Below the header, the Filtering and Selection Controls section allows users to refine their view 
+and select the specific timetable they wish to access. The controls include several dropdown 
+selectors with predefined or currently selected values such as Deg ree, set to BE; Batch, set to 
+CSE (2023–2027); Department, set to Computer Science Engineering (C); and Semester, set 
+to Semester 1 – 2023–2024. These options make it easy to locate and manage the correct 
+timetable based on the academic structure. 
+ 
+Overall, the Timetable Management page provides a structured and intuitive interface for 
+academic scheduling, ensuring that users can seamlessly navigate between departments and 
+semesters while maintaining organized class schedules for both staff and students. 
+ 
+Attendace Management 
+ 
+ 
+Fig 8.12 – Admin Attendance Management Page – Module for viewing timetables and 
+marking attendance. 
+ 
+The Admin Attendance Management page is a key component of the Admin Panel, designed 
+to help administrators efficiently manage and monitor class attendance records. The main 
+
+
+=== PAGE 30 ===
+ 
+29 
+ 
+purpose of this page is to view the class timetable within a specific date range, allowing the 
+admin to take, verify, or analyze attendance data for different departments, batches, and 
+semesters. 
+ 
+At the top of the interface, the page prominently displays the title “Admin Attendance 
+Management”, ensuring that the user is aware of the current section they are managing. 
+Alongside the title, a green success notification box appears in the upper -right corner of the 
+screen, displaying the message “Timetable generated successfully!”, which confirms that the 
+timetable data has been successfully retrieved and displayed for the selected criteria. 
+ 
+Beneath the header, the page provides a filtering and selection panel that enables the admin to 
+customize their view according to academic parameters. The available filters include Degree 
+(BE), Batch (2023), Department (Computer Science Engineering - CSE), and Semester 
+(Semester 1). These dropdown menus ensure that the administrator can narrow down the data 
+to a specific group of students or courses. To refine the results further, two date fields — From 
+Date (10/24/2025) and To Date (10/30/2025) — allow the admin to specify the exact time 
+period for which the timetable should be generated. Once all filters are selected, the “View 
+Timetable” button, styled in blue, initiates the loading process and displays the timetable on 
+the screen. 
+ 
+After generating the timetable, the timetable section appears, showing a detailed schedule of 
+classes for the chosen date range. Each entry in the timetable typically includes details such as 
+date, subject name, faculty in charge, and time slots. This structured layout helps the admin or 
+staff quickly identify classes and manage attendance records more effectively. In some 
+systems, this page may also include interactive features such as marking attendance, editing 
+timetable entries, or downloading attendance reports for recordkeeping purposes. 
+ 
+Overall, the Admin Attendance Management page offers an organized and user -friendly 
+interface that simplifies attendance tracking. It ensures accuracy in maintaining academic 
+
+=== PAGE 31 ===
+ 
+30 
+ 
+records, promotes transparency in scheduling, and enhances administrative efficiency by 
+allowing quick access to class and attendance information across multiple academic divisions. 
+ 
+Attendance Report 
+ 
+ 
+Fig 8.13 – Admin Attendance Report Page – Page showing attendance reports and 
+performance summaries. 
+ 
+The Admin Attendance Report page is another important section of the Admin Panel, designed 
+to provide a detailed overview of student attendance records over a selected period. Its main 
+purpose is to generate, view, and analyze attendance performance across  various academic 
+parameters such as degree, batch, department, and semester. This page serves as a 
+comprehensive reporting tool that helps administrators and faculty members monitor student 
+participation and identify attendance trends for academic evaluation and record maintenance. 
+At the top of the page, the header displays the title “Admin Attendance Report”, clearly 
+indicating the purpose of the section. In some cases, a success notification (such as “Report 
+generated successfully!”) appears in a green box on the top -right corner, confirming that the 
+attendance report has been successfully created based on the selected filters. 
+
+
+=== PAGE 32 ===
+ 
+31 
+ 
+Below the header, the filter and selection controls allow the admin to customize the report. The 
+filters typically include Degree (BE), Batch (2023), Department (Computer Science 
+Engineering - CSE), and Semester (Semester 1). Additionally, From Date (10/01/2025) and To 
+Date (10/30/2025) fields enable the admin to specify the date range for which attendance data 
+should be analyzed. Once these parameters are selected, the admin can click the “Generate 
+Report” button—usually highlighted in blue—to load the detailed attendance summary for the 
+chosen criteria. 
+Once the report is generated, the attendance data table appears, displaying essential information 
+such as student roll number, name, total classes conducted, number of classes attended, 
+attendance percentage, and status (e.g., Present, Absent, or Shortage) . This tabular view 
+provides a clear and organized breakdown of attendance records, making it easier for 
+administrators to track individual and overall student performance. 
+Some implementations of the page may also include visual analytics, such as bar graphs or pie 
+charts, to represent attendance distribution more intuitively. These visuals help identify 
+students with low attendance or detect trends across subjects or depart ments. Moreover, the 
+page often features export options like Download Report (PDF/Excel) or Print Report, allowing 
+administrators to store or share the data for official documentation and academic audits. 
+Overall, the Admin Attendance Report page provides an efficient and data-driven approach to 
+attendance monitoring. It enhances administrative control, ensures transparency, and supports 
+decision-making by offering accurate attendance insights at both indiv idual and institutional 
+levels. This feature helps maintain discipline, track student engagement, and uphold academic 
+standards across the institution. 
+ 
+ 
+ 
+ 
+ 
+ 
+
+=== PAGE 33 ===
+ 
+32 
+ 
+Staff DashBoard 
+ 
+ 
+Fig 8.14 – Staff Dashboard (Faculty View – Kalaiselvi) – Personalized staff dashboard 
+displaying assigned courses. 
+ 
+The Staff Course Overview Page serves as a personalized dashboard for the faculty member 
+Kalaiselvi, displaying the courses assigned to her along with relevant academic details. At the 
+top of the page, the header features a greeting message, “HI, KALAISELVI”, accompanied by 
+a small profile icon, emphasizing that this is a personalized faculty view. On the top -right 
+corner, the navigation links — Home, Attendance, and Logout — provide easy access to key 
+sections of the platform, allowing seamless transitions  between course management and 
+attendance tracking modules. 
+The Course Overview Controls section enables the faculty member to filter, search, and 
+organize her assigned courses efficiently. The page title, “Course Overview”, is prominently 
+displayed, followed by several interactive control fields that enhance usabi lity. These include 
+a Status Filter dropdown, currently set to In Progress; a Search Bar with the placeholder text 
+“Search” for quick keyword -based lookups; a Sort By dropdown set to Sort by name; and a 
+View Selector dropdown currently set to Summary, allo wing the faculty to switch between 
+different view formats based on their preference. 
+
+
+=== PAGE 34 ===
+ 
+33 
+ 
+The Assigned Courses List occupies the lower portion of the page, presenting each allocated 
+course in a clean and organized card format. Each course card includes essential details such 
+as the Course Code and Name, Batch/Section, and Semester information. For example, Course 
+1 is 23CSE103 – Computer Networks, assigned to CSE BE 2023 Batch – Batch 1 under the 
+2023–2027 Odd Semester. Similarly, Course 2 is 23CSE104 – Database Management Systems 
+(DBMS), assigned to CSE BE 2023 Batch – Batch 2 within the same semester. 
+Overall, the Staff Course Overview Page provides a structured and intuitive interface that 
+enables faculty members to view, manage, and track their assigned courses efficiently, ensuring 
+an organized academic workflow and effective course handling. 
+ 
+ 
+Course DashBoard 
+ 
+Fig 8.15 – Course Dashboard – Computer Networks Course Management – Page for 
+managing course outcomes and evaluations. 
+ 
+The Computer Networks Course Management page serves as a central hub for managing the 
+academic and assessment-related components of the Computer Networks course. The course 
+context section clearly displays the Course Name as Computer Networks and the Semes ter as 
+2023–2027 Odd Semester, ensuring that the faculty member is operating within the correct 
+academic period and course framework. 
+
+
+=== PAGE 35 ===
+ 
+34 
+ 
+The main section of the page presents two distinct management options displayed as action 
+cards, allowing the faculty member to handle both evaluation setup and internal mark 
+consolidation effectively. The first card, titled Mark Allocation, is designed to  help manage 
+course outcomes, assessment tools, and student marks. This section likely provides access to a 
+configuration area where the faculty member can define the Course Outcomes (COs), assign 
+weights to various assessment tools such as Cycle Tests and  Assignments, and establish the 
+grading criteria before entering the individual student marks. 
+The second card, titled Internal Marks, allows the faculty member to view consolidated internal 
+marks and averages for the course. This section likely displays a summary table or report 
+containing the combined and averaged internal assessment marks for all enrolled students. The 
+data presented here is typically used for performance analysis and final grading submissions. 
+Overall, the Computer Networks Course Management page offers a simple and organized 
+interface that enables faculty members to configure evaluation structures and monitor student 
+performance effectively, ensuring smooth academic management and transparent m ark 
+processing. 
+Mark Allocation 
+ 
+ 
+Fig 8.16 – Mark Allocation Page – Interface for defining course outcomes and assigning 
+assessment weights. 
+
+
+=== PAGE 36 ===
+ 
+35 
+ 
+Mark Allocation Page Details 
+1. Header and Course Context 
+• Page Title: Mark Allocation 
+• Course Code: 23CSE103 
+2. Course Partitions Summary 
+This section summarizes the number of Course Outcomes defined across different learning 
+components. There is an action button to modify this structure. 
+• Edit Partitions (Blue Button) 
+• Theory COs: 1 
+• Practical COs: 0 
+• Experiential COs: 0 
+3. Course Outcomes (COs) List 
+This section lists the defined Course Outcomes that students must achieve, currently showing 
+one outcome: 
+• Heading: Course Outcomes (COs) 
+• Defined Outcome: CO1 (THEORY) (This section appears expandable, as indicated by 
+the small upward arrow next to CO1). 
+• Action Button: Export (Purple Button, likely used to export the CO details or a related 
+template). 
+ 
+Mark Entry for courses 
+ 
+
+=== PAGE 37 ===
+ 
+36 
+ 
+ 
+Fig 8.17 – Mark Entry Page – Page for entering and uploading marks for assessments. 
+ 
+Internal Mark Calculation 
+The Mark Entry Page is designed to provide faculty members with a structured interface for 
+managing and entering marks corresponding to specific Course Outcomes (COs). At the top of 
+the page, the header section displays the page title “Mark Entry”, along w ith a CO selector 
+dropdown that allows the user to choose the desired Course Outcome for which marks need to 
+be entered. In the current context, CO1 (THEORY) is selected, indicating that the marks being 
+managed belong to the first course outcome of the theory component. 
+ 
+Beneath the header lies the Tools Management and Actions section, titled “Tools for CO1”. 
+This section lists all the previously defined assessment tools that contribute to the selected CO 
+and offers faculty members the ability to modify or update them. On the top right of this section, 
+two prominent action buttons are provided: a blue “+ Add Tool” button that allows the addition 
+of new assessment instruments, and a green “Save” button used to store any changes made to 
+tool configurations or their weightages. 
+The table below these controls enumerates the existing assessment tools, each accompanied by 
+its respective weightage, maximum marks, and management actions. For instance, Quiz carries 
+
+
+=== PAGE 38 ===
+ 
+37 
+ 
+a 20% weightage, IAT 60%, and PT 20%, making the total weightage 100%. Alongside each 
+tool are action icons for Edit (Pencil), Delete (Trash), and Upload (Upload icon). These controls 
+enable quick management of each tool —allowing the faculty to modify deta ils, remove 
+assessments, or upload mark data as needed. 
+The inclusion of the Upload icon signifies that this page functions as a central control hub for 
+the mark entry process. When a faculty member clicks on an upload button or selects a specific 
+assessment tool (e.g., Quiz), they are likely directed to a detailed entry form or data grid where 
+the actual student marks for that particular assessment can be recorded. 
+In summary, the Mark Entry Page efficiently integrates course outcome selection, assessment 
+tool configuration, and direct mark uploading, thereby streamlining the evaluation workflow 
+for instructors and ensuring accuracy in the internal assessment process. 
+ 
+ 
+Fig 8.18 – Internal Marks Overview Page – Summary of internal marks and student 
+performance. 
+ 
+ 
+ 
+
+
+=== PAGE 39 ===
+ 
+38 
+ 
+ 
+The Internal Marks Overview page acts as the consolidated reporting and analysis section for 
+monitoring student performance in the courses handled by the staff member Kalaiselvi. It 
+provides a comprehensive view of internal assessments, allowing faculty to  review, analyze, 
+and export student marks efficiently. The header section begins with a personalized greeting, 
+“HI, KALAISELVI”, followed by navigation links on the top right corner — Home, 
+Attendance, and Logout. The page title, “Internal Marks Overview”, is prominently displayed, 
+along with a blue “Export to CSV” button that enables faculty members to download the 
+displayed student mark data for record keeping or further analysis. 
+ 
+Below the header, the Filtering and Search Controls section allows the faculty to refine and 
+locate specific student records quickly. The interface indicates the total Student Count as 
+“Showing 39 of 39 students”, confirming that all records are visible. The filter options include 
+two input fields labeled “Filter by Reg No…” and “Filter by Student Name…”, along with two 
+dropdown menus — one defaulted to All and another labeled Mark, likely used for filtering 
+students based on mark type or range. These tools  make it easier to search and analyze 
+performance data without manually scrolling through the entire list. 
+ 
+The central portion of the page features the Assessment Overview Table, which serves as the 
+main analytical area. It carries the section title “Assessment Overview” with the subtitle 
+“Internal marks and performance analysis”, clearly describing its purpose . The section also 
+specifies that 39 students are currently enrolled in the course. The table columns include 
+Register No., Student Name, CO1 (THEORY), Theory Average (T), and Final Average, each 
+representing key aspects of student performance. For instance, CO1 (THEORY) displays marks 
+related to the first Course Outcome, while Theory Average and Final Average summarize 
+individual and overall internal performance. 
+ 
+A few sample student records illustrate the data presentation — Aarabhi Shen S A (Reg. No. 
+2312001) scored 57.0 in CO1 with a Theory Average and Final Average of 57.00, whereas 
+
+=== PAGE 40 ===
+ 
+39 
+ 
+Akash K (Reg. No. 2312002) scored 74.0 in CO1 with both averages recorded as 74.00. This 
+structured layout allows faculty members to easily evaluate academic performance, identify 
+trends, and ensure transparent record management. 
+ 
+Staff Side Attendance 
+ 
+Fig 8.19 – Staff Attendance Page – Section for faculty to manage attendance of assigned  
+classes. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+=== PAGE 41 ===
+ 
+40 
+ 
+Students Staff Wise 
+ 
+Fig 8.20 – Students Staff-Wise Attendance Page – Detailed view of attendance for a 
+specific course and batch. 
+ 
+23CSE103 page serves as the attendance management interface for a specific course, primarily 
+used by the faculty member Kalaiselvi to take or review attendance for a particular class period. 
+The header section displays the page title “Attendance for 23CSE1 03”, clearly indicating the 
+course code for which attendance is being managed. On the top right corner, essential 
+contextual details are shown, including the Date (2025-10-24), Period (2), and Section (N/A), 
+helping the faculty verify that attendance is being recorded for the correct session 
+Below the header, the Status Controls section provides tools for managing attendance 
+efficiently. A Mass Status Dropdown labeled “Select Status for All” allows the faculty to 
+quickly assign a uniform status — such as Present, Absent, or On Duty — to all students in the 
+class simultaneously, thereby saving time during data entry. Additionally, the Current Period 
+Display reiterates “Period 2”, confirming the time slot currently being recorded. 
+Overall, this page is designed to offer a streamlined and user -friendly interface for faculty 
+members to manage attendance accurately and efficiently during each class session. 
+ 
+
+
+=== PAGE 42 ===
+ 
+41 
+ 
+CHAPTER 9 
+CONCLUSION 
+ 
+In conclusion, the Learning Management System provides a simple and effective solution for 
+managing educational activities in a digital environment. It reduces the need for manual record-
+keeping and streamlines course management, assignments, and grading. By offering separate 
+logins for Admin, Teacher, and Student, the system ensures clear role-based access and control. 
+Admins can manage courses, teachers, and student records, while Teachers can efficiently 
+handle course content and student assessments, and Students can easily track their progress and 
+submit assignments. The system helps maintain accurate records, improves security, and saves 
+time. Overall, it is a valuable tool for educational institutions to manage learning activities in 
+an organized and professional manner. 
+
