@@ -2,17 +2,17 @@
  * KR Accounts ERP — Comprehensive Test Suite
  * Tests all core subsystems:
  * 1. Database & Models Connectivity
- * 2. Multi-Profile Authentication (Normal, Jegathesh Sir, Suresh Sir)
+ * 2. Multi-Profile Authentication (Beginning Users & Executives)
  * 3. Double-Entry Accounting Engine & Balance Verification
  * 4. External Sales Invoice to Balanced Journal Voucher Processing
- * 5. Tally XML Envelope Generation & Mock Tally Integration
+ * 5. Tally Prime Integration & Account Mapping
  */
 
 import { spawn } from "child_process";
 import { sequelize, User, Account, Group, SubGroup, Voucher, VoucherItem } from "../models/index.js";
 import { loginUser } from "../services/accountService.js";
 import { processInvoiceToJV } from "../services/invoiceService.js";
-import { buildVoucherXml } from "../services/tallyService.js";
+import { mapAccountToTallyParent } from "../services/tallyService.js";
 
 let totalTests = 0;
 let passedTests = 0;
@@ -49,27 +49,27 @@ async function runAll() {
     assert(false, `Database connection failed: ${err.message}`);
   }
 
-  // 2. AUTHENTICATION & LOGIN TEST
+  // 2. AUTHENTICATION & LOGIN TEST (Beginning Users & Executives)
   console.log("\n[2/5] Testing User Authentication & Executive Profiles...");
   try {
-    // Normal Admin
-    const adminRes = await loginUser("admin", "123456");
-    assert(adminRes.success === true && adminRes.user === "admin", "Normal Login (admin) successful");
+    // Beginning Users (e.g. Guru123 / SIVA / test)
+    const guruRes = await loginUser("Guru123", "Guru@1998");
+    assert(guruRes.success === true && guruRes.user === "Guru123", "Beginning User (Guru123) login verified");
 
     // Jegathesh Sir
     const jegRes = await loginUser("Jegathesh Sir", "123456");
-    assert(jegRes.success === true && jegRes.user.includes("Jegathesh"), "Executive Login (Jegathesh Sir) successful");
+    assert(jegRes.success === true && jegRes.user.includes("Jegathesh"), "Executive Login (Jegathesh Sir) verified");
 
     // Suresh Sir
     const surRes = await loginUser("Suresh Sir", "123456");
-    assert(surRes.success === true && surRes.user.includes("Suresh"), "Executive Login (Suresh Sir) successful");
+    assert(surRes.success === true && surRes.user.includes("Suresh"), "Executive Login (Suresh Sir) verified");
 
     // Case-insensitivity check
     const caseRes = await loginUser("jegathesh", "password123");
     assert(caseRes.success === true, "Case-insensitive username matching functional");
 
     // Invalid password check
-    const badRes = await loginUser("admin", "wrongpassword");
+    const badRes = await loginUser("Guru123", "wrongpassword");
     assert(badRes.success === false, "Unauthorized password correctly rejected");
   } catch (err) {
     assert(false, `Auth test error: ${err.message}`);
@@ -118,27 +118,16 @@ async function runAll() {
     assert(false, `Invoice conversion error: ${err.message}`);
   }
 
-  // 4. TALLY XML ENVELOPE GENERATOR TEST
-  console.log("\n[4/5] Testing Tally XML Envelope Generator...");
+  // 4. TALLY ACCOUNT MAPPING TEST
+  console.log("\n[4/5] Testing Tally Account Group Mapping...");
   try {
-    const sampleVoucher = {
-      voucherNo: "JV-00001",
-      voucherDate: "2026-10-11",
-      narration: "Test Tally Export Voucher",
-      totalAmount: 5000,
-      items: [
-        { accountName: "Printing Expenses", debit: 5000, credit: 0 },
-        { accountName: "Cash", debit: 0, credit: 5000 }
-      ]
-    };
+    const debtorGroup = mapAccountToTallyParent({ groupName: "Current Assets", subGroupName: "Sundry Debtors" });
+    assert(debtorGroup === "Sundry Debtors", "Sundry Debtors mapped correctly to Tally parent");
 
-    const xml = buildVoucherXml(sampleVoucher);
-    assert(xml.includes("<ENVELOPE>"), "Tally <ENVELOPE> root tag generated");
-    assert(xml.includes("<VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>"), "Voucher Type mapped to Journal");
-    assert(xml.includes("Printing Expenses"), "Ledger entries mapped correctly");
-    assert(xml.includes("<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>"), "Debit line flagged positive for Tally");
+    const bankGroup = mapAccountToTallyParent({ groupName: "Bank Accounts" });
+    assert(bankGroup === "Bank Accounts", "Bank Accounts mapped correctly to Tally parent");
   } catch (err) {
-    assert(false, `Tally generator error: ${err.message}`);
+    assert(false, `Tally mapping error: ${err.message}`);
   }
 
   // 5. MOCK TALLY SERVER END-TO-END SUITE
