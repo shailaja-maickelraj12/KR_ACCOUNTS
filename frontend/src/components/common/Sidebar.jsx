@@ -54,13 +54,26 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, setCurre
       </div>
 
       {/* Acting User Selecter */}
-      <div className="p-4 bg-slate-50 border-b border-[#E2E8F0] text-xs" id="sidebar-user-selector">
-        <label className="block text-[10px] font-semibold text-[#64748B] uppercase tracking-wider mb-2">
-          Logged In User
-        </label>
-        <div className="flex items-center justify-between bg-white border border-[#E2E8F0] rounded p-1.5">
-          <span className="font-bold text-[#1E293B] truncate">🧑‍💻 {currentUser}</span>
-          <button onClick={() => setCurrentUser(null)} className="text-red-500 hover:text-red-700 font-semibold cursor-pointer">
+      <div className="p-3.5 bg-slate-50 border-b border-[#E2E8F0] text-xs" id="sidebar-user-selector">
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
+            Active User
+          </label>
+          {String(currentUser || "").toLowerCase().includes("sir") && (
+            <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              Executive
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-between bg-white border border-[#E2E8F0] rounded-xl p-2 shadow-xs">
+          <span className="font-bold text-[#1E293B] truncate flex items-center gap-1.5">
+            {String(currentUser || "").toLowerCase().includes("sir") ? "👔" : "🧑‍💻"} {currentUser}
+          </span>
+          <button 
+            onClick={() => setCurrentUser(null)} 
+            className="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-0.5 rounded-md font-bold text-[11px] cursor-pointer transition-all"
+            title="Sign out of current account"
+          >
             Logout
           </button>
         </div>

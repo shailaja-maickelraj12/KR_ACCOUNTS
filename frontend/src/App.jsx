@@ -53,9 +53,43 @@ import {
 
 const AuthScreen = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [loginRole, setLoginRole] = useState("normal"); // 'normal' | 'jegathesh' | 'suresh'
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSelectRole = (role) => {
+    setLoginRole(role);
+    setError("");
+    if (role === "jegathesh") {
+      setUsername("Jegathesh Sir");
+      setPassword("123456");
+    } else if (role === "suresh") {
+      setUsername("Suresh Sir");
+      setPassword("123456");
+    } else {
+      setUsername("");
+      setPassword("");
+    }
+  };
+
+  const handleQuickLogin = async (userToLogin, passToLogin) => {
+    setError("");
+    setLoading(true);
+    try {
+      const result = await authenticateUser(userToLogin, passToLogin, false);
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError(err.message || "Failed to log in");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,12 +97,18 @@ const AuthScreen = ({ onLogin }) => {
     if (!username.trim()) return setError("Please enter a username.");
     if (!password.trim()) return setError("Please enter a password.");
     
-    // RESTORED ORIGINAL LOGIC: !isLogin as the third argument (isRegistering)
-    const result = await authenticateUser(username, password, !isLogin);
-    if (result.success) {
-      onLogin(result.user);
-    } else {
-      setError(result.message);
+    setLoading(true);
+    try {
+      const result = await authenticateUser(username, password, !isLogin);
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,50 +124,153 @@ const AuthScreen = ({ onLogin }) => {
       ></div>
 
       {/* 2. MAIN INTERACTIVE CONTAINER */}
-      <div className="relative bg-white w-full max-w-5xl h-[650px] rounded-[40px] shadow-[0_40px_120px_-20px_rgba(15,23,42,0.3)] overflow-hidden flex z-10 border border-white">
+      <div className="relative bg-white w-full max-w-5xl h-[670px] rounded-[40px] shadow-[0_40px_120px_-20px_rgba(15,23,42,0.3)] overflow-hidden flex z-10 border border-white">
         
         {/* --- LEFT SLOT: LOGIN FORM (Visible when isLogin is true) --- */}
-        <div className={`w-1/2 h-full flex flex-col justify-center px-20 transition-all duration-1000 ease-in-out z-20 ${!isLogin ? 'opacity-0 scale-90 pointer-events-none' : 'opacity-100 scale-100 pointer-events-auto'}`}>
-          <div className="mb-10">
-            <div className="bg-blue-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200">
-              <Cpu className="text-white w-6 h-6" />
+        <div className={`w-1/2 h-full flex flex-col justify-center px-12 transition-all duration-1000 ease-in-out z-20 ${!isLogin ? 'opacity-0 scale-90 pointer-events-none' : 'opacity-100 scale-100 pointer-events-auto'}`}>
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="bg-blue-600 w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                <Cpu className="text-white w-5 h-5" />
+              </div>
+              <span className="text-[10px] bg-slate-100 text-slate-600 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                Enterprise Suite v2.0
+              </span>
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">Welcome to<br/>AccuFlow ERP</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] mt-3">Enterprise Suite v2.0</p>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">Welcome to AccuFlow ERP</h1>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Select a login profile or enter your credentials.</p>
+          </div>
+
+          {/* 3 LOGIN MODE TABS: Normal / Jegathesh Sir / Suresh Sir */}
+          <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100/90 rounded-2xl mb-3.5 border border-slate-200/80">
+            <button
+              type="button"
+              onClick={() => handleSelectRole("normal")}
+              className={`py-2 px-1.5 rounded-xl text-[11px] font-bold tracking-tight transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                loginRole === "normal"
+                  ? "bg-white text-slate-900 shadow-sm border border-slate-200/60"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              🏢 Normal Login
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectRole("jegathesh")}
+              className={`py-2 px-1.5 rounded-xl text-[11px] font-bold tracking-tight transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                loginRole === "jegathesh"
+                  ? "bg-blue-600 text-white shadow-md shadow-blue-200 font-extrabold"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              👔 Jegathesh Sir
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectRole("suresh")}
+              className={`py-2 px-1.5 rounded-xl text-[11px] font-bold tracking-tight transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                loginRole === "suresh"
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-200 font-extrabold"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              👔 Suresh Sir
+            </button>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {error && isLogin && (
-              <div className="p-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl text-[11px] font-bold">
+              <div className="p-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl text-[11px] font-bold">
                 {error}
               </div>
             )}
+
+            {loginRole !== "normal" && (
+              <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold ${
+                loginRole === "jegathesh" 
+                  ? "bg-blue-50/70 border-blue-200 text-blue-800" 
+                  : "bg-indigo-50/70 border-indigo-200 text-indigo-800"
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">👔</span>
+                  <div>
+                    <div className="leading-tight">{loginRole === "jegathesh" ? "Jegathesh Sir" : "Suresh Sir"} Login</div>
+                    <div className="text-[10px] font-medium opacity-75">Full ERP access with same dashboard content</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin(loginRole === "jegathesh" ? "Jegathesh Sir" : "Suresh Sir", "123456")}
+                  className={`px-3 py-1.5 rounded-lg text-white text-[11px] font-bold cursor-pointer transition-all active:scale-95 shadow-sm ${
+                    loginRole === "jegathesh" ? "bg-blue-600 hover:bg-blue-700" : "bg-indigo-600 hover:bg-indigo-700"
+                  }`}
+                >
+                  Quick Sign In &rarr;
+                </button>
+              </div>
+            )}
+
             <div className="group">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-widest group-focus-within:text-blue-600 transition-colors">Username</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1 tracking-widest group-focus-within:text-blue-600 transition-colors">
+                {loginRole === "normal" ? "Username / Admin ID" : "Executive Username"}
+              </label>
               <input 
                 type="text" 
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)} 
-                className="w-full p-4 border border-slate-100 rounded-2xl outline-none focus:border-blue-600 focus:bg-white transition-all bg-slate-50/80 text-sm shadow-sm" 
-                placeholder="Enter admin ID" 
+                className="w-full p-3 border border-slate-200 rounded-xl outline-none focus:border-blue-600 focus:bg-white transition-all bg-slate-50/80 text-sm shadow-sm font-semibold" 
+                placeholder={loginRole === "normal" ? "Enter username (e.g. admin)" : "Username"} 
                 required
               />
             </div>
             <div className="group">
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2 ml-1 tracking-widest group-focus-within:text-blue-600 transition-colors">Password</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1 tracking-widest group-focus-within:text-blue-600 transition-colors">
+                Password
+              </label>
               <input 
                 type="password" 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
-                className="w-full p-4 border border-slate-100 rounded-2xl outline-none focus:border-blue-600 focus:bg-white transition-all bg-slate-50/80 text-sm shadow-sm" 
+                className="w-full p-3 border border-slate-200 rounded-xl outline-none focus:border-blue-600 focus:bg-white transition-all bg-slate-50/80 text-sm shadow-sm" 
                 placeholder="••••••••" 
                 required
               />
             </div>
-            <button type="submit" className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-xl hover:bg-blue-700 transition-all cursor-pointer text-xs uppercase tracking-[0.2em] mt-4 active:scale-95 shadow-slate-200">
-              Secure Sign In
+            <button 
+              type="submit" 
+              disabled={loading}
+              className={`w-full text-white font-bold py-3.5 rounded-xl shadow-lg transition-all cursor-pointer text-xs uppercase tracking-[0.15em] active:scale-95 disabled:opacity-50 ${
+                loginRole === "jegathesh" 
+                  ? "bg-blue-600 hover:bg-blue-700 shadow-blue-200" 
+                  : loginRole === "suresh" 
+                  ? "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200" 
+                  : "bg-slate-900 hover:bg-blue-700 shadow-slate-200"
+              }`}
+            >
+              {loading ? "Signing In..." : loginRole === "jegathesh" ? "Sign In as Jegathesh Sir" : loginRole === "suresh" ? "Sign In as Suresh Sir" : "Secure Sign In"}
             </button>
           </form>
+
+          {/* Quick Direct Sign-In Shortcut Pills */}
+          <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span className="font-semibold text-[10px] uppercase tracking-wider text-slate-400">1-Click Direct:</span>
+            <div className="flex gap-1.5">
+              <button 
+                type="button" 
+                onClick={() => handleQuickLogin("Jegathesh Sir", "123456")}
+                className="px-2.5 py-1 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-semibold rounded-lg transition-all cursor-pointer border border-slate-200/60 text-[11px]"
+              >
+                👔 Jegathesh Sir
+              </button>
+              <button 
+                type="button" 
+                onClick={() => handleQuickLogin("Suresh Sir", "123456")}
+                className="px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold rounded-lg transition-all cursor-pointer border border-slate-200/60 text-[11px]"
+              >
+                👔 Suresh Sir
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* --- RIGHT SLOT: REGISTRATION FORM (Visible when isLogin is false) --- */}
