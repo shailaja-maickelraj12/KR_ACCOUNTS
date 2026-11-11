@@ -10,7 +10,7 @@ import {
   ListRestart,
   CreditCard,
   FileSpreadsheet,
-  Zap
+  Send
 } from "lucide-react";
 
 export default function Sidebar({ activeTab, setActiveTab, currentUser, setCurrentUser }) {
@@ -23,12 +23,12 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, setCurre
 
     { id: "journal-voucher", label: "Journal Voucher", icon: FileText, category: "Journal Voucher" },
 
+    { id: "tally-posting", label: "Tally Posting", icon: Send, category: "Tally" },
+
     { id: "contra-entry", label: "Contra Entry", icon: ListRestart, category: "Contra Entry" },
 
     { id: "debit-note", label: "Debit Note", icon: FileText, category: "Debit Note" },
     { id: "credit-note", label: "Credit Note", icon: FileText, category: "Credit Note" },
-
-    { id: "external-invoices", label: "Sales Invoices Sync", icon: Zap, category: "Integrations" },
 
     { id: "group-master", label: "Group Master", icon: Layers, category: "Masters" },
     { id: "subgroup-master", label: "Sub Group Master", icon: Layers, category: "Masters" },
@@ -81,7 +81,7 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, setCurre
 
       {/* Main Navigation Item groups */}
       <div className="flex-1 overflow-y-auto py-4" id="sidebar-nav">
-        {["Payment", "Receipt", "Journal Voucher", "Contra Entry", "Debit Note", "Credit Note", "Integrations", "Masters", "Reports", "System"].map(cat => {
+        {["Payment", "Receipt", "Journal Voucher", "Tally", "Contra Entry", "Debit Note", "Credit Note", "Masters", "Reports", "System"].map(cat => {
           const items = menuItems.filter(i => i.category === cat);
           if (items.length === 0) return null;
           return (
@@ -111,15 +111,6 @@ export default function Sidebar({ activeTab, setActiveTab, currentUser, setCurre
             </div>
           );
         })}
-      </div>
-
-      {/* Session Footer details */}
-      <div className="p-4 border-t border-[#E2E8F0] bg-slate-50 text-[10px] text-[#64748B]" id="sidebar-footer">
-        <div>FY: 2026 - 2027</div>
-        <div className="flex items-center gap-1.5 mt-1 font-semibold text-[#166534]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#166534] inline-block animate-pulse"></span>
-          <span>Durable Local Engine Active</span>
-        </div>
       </div>
     </aside>
   );

@@ -5,8 +5,6 @@ import apiRoutes from "./routes/api.routes.js";
 import { sequelize } from "./models/index.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 
-import { handleWebhook } from "./controllers/externalInvoiceController.js";
-
 const app = express();
 const port = Number(process.env.PORT || 6400);
 const shouldSync = String(process.env.DB_SYNC).toLowerCase() === "true";
@@ -42,12 +40,6 @@ app.get("/health", (req, res) => {
 app.get('/', (req, res) => {
     res.send('Backend server is running smoothly!');
 });
-
-// Direct Webhook Aliases for maximum compatibility with external Sales module
-app.post("/webhook", handleWebhook);
-app.post("/api/webhook", handleWebhook);
-app.post("/ams/webhook", handleWebhook);
-app.post("/external/invoices/webhook", handleWebhook);
 
 app.use("/ams", apiRoutes);
 app.use(errorMiddleware);

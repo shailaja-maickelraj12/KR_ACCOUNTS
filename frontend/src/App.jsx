@@ -14,7 +14,7 @@ import BankPayment from './components/vouchers/BankPayment';
 import BankReceipt from './components/vouchers/BankReceipt';
 import DebitNote from "./components/vouchers/DebitNote";
 import CreditNote from "./components/vouchers/CreditNote";
-import ExternalInvoiceSync from "./components/sales/ExternalInvoiceSync";
+import TallyPosting from "./components/tally/TallyPosting";
 
 import { 
   getDB, 
@@ -1106,18 +1106,12 @@ export default function App() {
           )}
 
           {/* TAB: EXTERNAL INVOICE SYNC */}
-          {activeTab === "external-invoices" && (
-            <div className="flex-1 overflow-hidden flex flex-col min-h-0" id="external-invoices-tab">
-              <PageHeader 
-                category="Integrations" 
-                title="Sales Invoices Sync & Automation" 
-                description="Fetch invoices from Raw Material / Sales ERP, verify buyer ledgers, and automatically post double-entry Journal Vouchers." 
-              />
-              <ExternalInvoiceSync 
+          {activeTab === "tally-posting" && (
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0" id="tally-posting-tab">
+              <TallyPosting 
                 database={db}
-                onNavigateToVoucher={() => {
-                  setActiveTab("journal-voucher");
-                }}
+                onSaveVoucher={handleSaveVoucher}
+                currentUser={db.currentUser}
               />
             </div>
           )}

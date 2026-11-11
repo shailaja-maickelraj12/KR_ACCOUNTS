@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mill Accounts Management System - Architectural Diagrams (Black & White)</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+  body {
+    font-family: "Times New Roman", Times, Georgia, serif;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 0;
+    padding: 30px;
+  }
+  .page {
+    page-break-after: always;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 1px dashed #ccc;
+  }
+  .page:last-child {
+    border-bottom: none;
+    page-break-after: avoid;
+  }
+  h2.diagram-title {
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+  }
+  .caption {
+    text-align: center;
+    font-size: 13pt;
+    font-style: italic;
+    margin-top: 25px;
+  }
+  .box {
+    border: 1.5px solid #000000;
+    background: #ffffff;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .box-header {
+    border-bottom: 1.5px solid #000000;
+    padding: 6px 8px;
+    font-weight: bold;
+    font-size: 11pt;
+    text-align: center;
+    background: #ffffff;
+  }
+  .box-sub {
+    font-weight: normal;
+    font-size: 9.5pt;
+    font-style: italic;
+    display: block;
+  }
+  .box-body {
+    padding: 8px 10px;
+    font-size: 9.5pt;
+    line-height: 1.45;
+    font-family: "Courier New", Courier, monospace;
+  }
+  .box-body.normal-font {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+  
+  /* Flex & Grid layouts */
+  .grid-3x3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 98%;
+    margin: 0 auto;
+    position: relative;
+  }
+  .grid-3x1 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    width: 98%;
+    margin: 0 auto;
+  }
+  .grid-2x1 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 35px;
+    width: 80%;
+    margin: 0 auto;
+  }
+  .arrow-indicator {
+    text-align: center;
+    font-size: 18pt;
+    font-weight: bold;
+    margin: 8px 0;
+  }
+  .print-btn-bar {
+    text-align: right;
+    margin-bottom: 20px;
+  }
+  .print-btn {
+    padding: 8px 16px;
+    background: #000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+  @media print {
+    .print-btn-bar { display: none; }
+    .page { border-bottom: none; margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-btn-bar">
+  <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+<!-- ========================================== -->
+<!-- 1. BACKEND ARCHITECTURE & FOLDER STRUCTURE -->
+<!-- ========================================== -->
+<div class="page">
+  <h2 class="diagram-title">BACKEND ARCHITECTURE & FOLDER STRUCTURE</h2>
+
+  <div style="width: 95%; margin: 0 auto; position: relative;">
+    <!-- Top 3 Boxes -->
+    <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 20px;">
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          API ROUTE LAYER<br><span class="box-sub">(routes/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          auth.routes.js<br>
+          masterRoutes.js<br>
+          voucherRoutes.js<br>
+          reportRoutes.js<br>
+          tallyRoutes.js
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; font-size: 22pt; font-weight: bold;">➔</div>
+
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          CONTROLLER LAYER<br><span class="box-sub">(controllers/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          authController.js<br>
+          masterController.js<br>
+          voucherController.js<br>
+          reportController.js<br>
+          tallyController.js
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; font-size: 22pt; font-weight: bold;">➔</div>
+
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          SERVICE & UTIL LAYER<br><span class="box-sub">(services/ & utils/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          voucherService.js<br>
+          reportService.js<br>
+          tallyService.js<br>
+          formulaEvaluator.js<br>
+          reportGenerator.js
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow up to Controller Layer -->
+    <div style="display: flex; justify-content: center; margin: 15px 0;">
+      <div style="width: 50%; display: flex; justify-content: flex-start; padding-left: 20%;">
+        <span style="font-size: 20pt; font-weight: bold;">▲</span>
+      </div>
+    </div>
+
+    <!-- Bottom 2 Boxes -->
+    <div style="display: flex; justify-content: center; gap: 35px; width: 85%; margin: 0 auto;">
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          ORM & MODEL LAYER<br><span class="box-sub">(models/ & config/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          database.js<br>
+          Account.js / Group.js<br>
+          Voucher.js / Item.js<br>
+          TDSMaster.js / User.js
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; font-size: 22pt; font-weight: bold;">➔</div>
+
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          DATABASE ENGINE
+        </div>
+        <div class="box-body normal-font" style="text-align: center; padding-top: 15px;">
+          SQLite / MySQL Engine<br>
+          ACID Transactions<br>
+          Foreign Keys & Indexes<br>
+          Audit Trail Logs
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">Fig 8.1 – Backend Folder & Architectural Flowchart (Black & White)</div>
+</div>
+
+<!-- ========================================== -->
+<!-- 2. FRONTEND COMPONENT ARCHITECTURE & MODULES -->
+<!-- ========================================== -->
+<div class="page">
+  <h2 class="diagram-title">FRONTEND COMPONENT ARCHITECTURE & MODULES</h2>
+
+  <div style="width: 95%; margin: 0 auto;">
+    <!-- Root application box -->
+    <div class="box" style="width: 45%; margin: 0 auto;">
+      <div class="box-header">
+        ROOT APPLICATION<br><span class="box-sub">(App.jsx / MainLayout.jsx)</span>
+      </div>
+      <div class="box-body normal-font" style="text-align: center; padding: 12px;">
+        Global Navigation & State Handling
+      </div>
+    </div>
+
+    <!-- 3 Down Arrows -->
+    <div style="display: flex; justify-content: space-around; width: 80%; margin: 10px auto;">
+      <span style="font-size: 18pt;">↙</span>
+      <span style="font-size: 18pt;">↓</span>
+      <span style="font-size: 18pt;">↘</span>
+    </div>
+
+    <!-- 3 Middle Modules -->
+    <div style="display: flex; justify-content: space-between; gap: 20px;">
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          MASTERS MODULE<br><span class="box-sub">(components/masters/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          AccountMaster.jsx<br>
+          GroupMaster.jsx<br>
+          SubGroupMaster.jsx<br>
+          TDSMaster.jsx
+        </div>
+      </div>
+
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          VOUCHERS MODULE<br><span class="box-sub">(components/vouchers/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          JournalVoucher.jsx<br>
+          CashPayment / Receipt.jsx<br>
+          BankPayment / Receipt.jsx<br>
+          ContraEntry.jsx / Notes
+        </div>
+      </div>
+
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          REPORTS MODULE<br><span class="box-sub">(components/reports/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          GeneralLedger.jsx<br>
+          CashBook.jsx / DayBook.jsx<br>
+          TrialBalance.jsx<br>
+          ProfitLoss & BalanceSheet
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashed connector indication -->
+    <div style="display: flex; justify-content: space-around; width: 60%; margin: 15px auto 10px auto;">
+      <span style="font-size: 16pt; border-bottom: 2px dashed #000; width: 100px; text-align: center; padding-bottom: 4px;">↓ (uses)</span>
+      <span style="font-size: 16pt; border-bottom: 2px dashed #000; width: 100px; text-align: center; padding-bottom: 4px;">↓ (uses)</span>
+    </div>
+
+    <!-- 2 Bottom Boxes -->
+    <div style="display: flex; justify-content: center; gap: 35px; width: 85%; margin: 15px auto 0 auto;">
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          COMMON COMPONENTS<br><span class="box-sub">(components/common/)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          Navbar.jsx / Sidebar.jsx<br>
+          DataTable.jsx / DateFilter.jsx<br>
+          ExcelImportModal.jsx
+        </div>
+      </div>
+
+      <div class="box" style="flex: 1;">
+        <div class="box-header">
+          API & DATA ENGINE<br><span class="box-sub">(api/ & database.js)</span>
+        </div>
+        <div class="box-body normal-font" style="text-align: center;">
+          axios.js / authApi.js<br>
+          masterApi.js / voucherApi.js<br>
+          reportApi.js / Calculations
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">Fig 8.2 – Frontend Folder & Module Architecture (Black & White)</div>
+</div>
+
+<!-- ========================================== -->
+<!-- 3. DOUBLE-ENTRY VOUCHER PROCESSING WORKFLOW -->
+<!-- ========================================== -->
+<div class="page">
+  <h2 class="diagram-title">DOUBLE-ENTRY VOUCHER PROCESSING WORKFLOW</h2>
+
+  <div style="width: 82%; margin: 0 auto;">
+    <!-- Step 1 -->
+    <div class="box" style="margin-bottom: 5px;">
+      <div class="box-header">1. VOUCHER SELECTION & SERIAL NUMBERING</div>
+      <div class="box-body normal-font" style="text-align: center;">
+        Select Voucher Type (JV / Cash Payment / Bank Payment / Contra / Debit & Credit Note)<br>
+        Auto-generate financial serial number (e.g. JV-00001, CP-00001) & set Voucher Date
+      </div>
+    </div>
+
+    <div class="arrow-indicator">↓</div>
+
+    <!-- Step 2 -->
+    <div class="box" style="margin-bottom: 5px;">
+      <div class="box-header">2. LINE-ITEM INPUT & OPTIONAL TAX CALCULATION</div>
+      <div class="box-body normal-font" style="text-align: center;">
+        Add Account Heads, Debit / Credit amounts, and item-level narrations<br>
+        Lookup TDS Master for section rate & automatically compute TDS / Surcharge lines
+      </div>
+    </div>
+
+    <div class="arrow-indicator">↓</div>
+
+    <!-- Step 3 -->
+    <div class="box" style="margin-bottom: 5px; border-width: 2px;">
+      <div class="box-header">3. DOUBLE-ENTRY MATHEMATICAL VALIDATION</div>
+      <div class="box-body normal-font" style="text-align: center; font-weight: bold;">
+        Formula Check: &Sigma; Total Debit == &Sigma; Total Credit (and Total &gt; 0)<br>
+        <span style="font-weight: normal;">• If Unbalanced: Display discrepancy difference & block submission.<br>
+        • If Balanced: Package payload & proceed to atomic API transaction.</span>
+      </div>
+    </div>
+
+    <div class="arrow-indicator">↓</div>
+
+    <!-- Step 4 -->
+    <div class="box" style="margin-bottom: 5px;">
+      <div class="box-header">4. ATOMIC DATABASE PERSISTENCE (POST /ams/vouchers)</div>
+      <div class="box-body normal-font" style="text-align: center;">
+        Upsert Voucher Header in <code>Voucher</code> table & bulk insert items in <code>VoucherItem</code> table<br>
+        Append audit trail entry to <code>AuditLog</code> table inside ACID transaction
+      </div>
+    </div>
+
+    <div class="arrow-indicator">↓</div>
+
+    <!-- Step 5 -->
+    <div class="box">
+      <div class="box-header">5. FINANCIAL LEDGER PROPAGATION & TALLY SYNC</div>
+      <div class="box-body normal-font" style="text-align: center;">
+        Post Debits & Credits to General Ledger and update Cash / Bank balances<br>
+        Recalculate Trial Balance, Profit & Loss, and Balance Sheet in real-time<br>
+        (Optional) Generate Tally Prime XML envelope and transmit to HTTP Port 9000
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">Fig 5.1 – Double-Entry Voucher Processing Workflow (Black & White)</div>
+</div>
+
+<!-- ========================================== -->
+<!-- 4. MILL ACCOUNT MANAGEMENT SYSTEM - CLASS DIAGRAM -->
+<!-- ========================================== -->
+<div class="page">
+  <h2 class="diagram-title">MILL ACCOUNT MANAGEMENT SYSTEM - CLASS DIAGRAM</h2>
+
+  <div class="grid-3x3">
+    <!-- Row 1 -->
+    <div class="box">
+      <div class="box-header">Account (Model)</div>
+      <div class="box-body">
+        + id: INT [PK]<br>
+        + code: VARCHAR<br>
+        + name: VARCHAR<br>
+        + group_id: INT [FK]<br>
+        + opening_balance: DECIMAL<br>
+        + calc_balance()<br>
+        + get_statement()
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">Voucher (Model)</div>
+      <div class="box-body">
+        + id: INT [PK]<br>
+        + voucher_no: VARCHAR<br>
+        + voucher_date: DATE<br>
+        + type: ENUM<br>
+        + total_amount: DECIMAL<br>
+        + is_posted: BOOLEAN<br>
+        + post_ledger()
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">VoucherItem (Model)</div>
+      <div class="box-body">
+        + id: INT [PK]<br>
+        + voucher_id: INT [FK]<br>
+        + account_id: INT [FK]<br>
+        + type: ENUM(DR/CR)<br>
+        + amount: DECIMAL<br>
+        + narration: TEXT
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="box">
+      <div class="box-header">Group (Model)</div>
+      <div class="box-body">
+        + id: INT [PK]<br>
+        + group_code: VARCHAR<br>
+        + group_name: VARCHAR<br>
+        + category: VARCHAR<br>
+        + is_active: BOOLEAN<br>
+        + get_subgroups()
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">SubGroup (Model)</div>
+      <div class="box-body">
+        + id: INT [PK]<br>
+        + parent_group_id: INT<br>
+        + name: VARCHAR<br>
+        + code: VARCHAR<br>
+        + get_accounts()
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">TDSMaster (Model)</div>
+      <div class="box-body">
+        + id: INT [PK]<br>
+        + section_code: VARCHAR<br>
+        + rate: DECIMAL<br>
+        + threshold: DECIMAL<br>
+        + calculate_tds()
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="box">
+      <div class="box-header">MasterController</div>
+      <div class="box-body">
+        + get_accounts()<br>
+        + create_account()<br>
+        + update_account()<br>
+        + delete_account()<br>
+        + get_groups()<br>
+        + get_subgroups()
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">VoucherController</div>
+      <div class="box-body">
+        + create_voucher()<br>
+        + get_vouchers()<br>
+        + get_voucher_by_id()<br>
+        + update_voucher()<br>
+        + delete_voucher()
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">ReportController</div>
+      <div class="box-body">
+        + get_general_ledger()<br>
+        + get_trial_balance()<br>
+        + get_profit_loss()<br>
+        + get_balance_sheet()<br>
+        + export_tally_xml()
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">Fig 4.1 – Class Diagram of Mill Account Management System (Black & White)</div>
+</div>
+
+<!-- ========================================== -->
+<!-- 5. MILL ACCOUNT MANAGEMENT SYSTEM - ER DIAGRAM -->
+<!-- ========================================== -->
+<div class="page">
+  <h2 class="diagram-title">MILL ACCOUNT MANAGEMENT SYSTEM - ER DIAGRAM</h2>
+
+  <div class="grid-3x3">
+    <!-- Row 1 -->
+    <div class="box">
+      <div class="box-header">USERS</div>
+      <div class="box-body">
+        id INT PK<br>
+        username VARCHAR<br>
+        password_hash VARCHAR<br>
+        role VARCHAR<br>
+        created_at DATETIME
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">GROUPS</div>
+      <div class="box-body">
+        id INT PK<br>
+        group_code VARCHAR<br>
+        group_name VARCHAR<br>
+        category VARCHAR<br>
+        is_active BOOL
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">SUB_GROUPS</div>
+      <div class="box-body">
+        id INT PK<br>
+        parent_group_id INT FK<br>
+        name VARCHAR<br>
+        code VARCHAR<br>
+        category VARCHAR
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="box">
+      <div class="box-header">ACCOUNTS</div>
+      <div class="box-body">
+        id INT PK<br>
+        account_code VARCHAR<br>
+        account_name VARCHAR<br>
+        group_id INT FK<br>
+        sub_group_id INT FK<br>
+        opening_balance DEC
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">VOUCHERS</div>
+      <div class="box-body">
+        id INT PK<br>
+        voucher_no VARCHAR<br>
+        voucher_date DATE<br>
+        type VARCHAR<br>
+        total_amount DEC<br>
+        narration TEXT
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">VOUCHER_ITEMS</div>
+      <div class="box-body">
+        id INT PK<br>
+        voucher_id INT FK<br>
+        account_id INT FK<br>
+        entry_type ENUM<br>
+        amount DEC<br>
+        narration TEXT
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="box">
+      <div class="box-header">TDS_MASTERS</div>
+      <div class="box-body">
+        id INT PK<br>
+        section_code VARCHAR<br>
+        nature_of_payment<br>
+        rate DEC<br>
+        threshold DEC
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">CONTRA_ENTRIES</div>
+      <div class="box-body">
+        id INT PK<br>
+        voucher_no VARCHAR<br>
+        from_account_id FK<br>
+        to_account_id FK<br>
+        amount DEC<br>
+        narration TEXT
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header">AUDIT_LOGS</div>
+      <div class="box-body">
+        id INT PK<br>
+        user_id INT FK<br>
+        action VARCHAR<br>
+        entity_name VARCHAR<br>
+        timestamp DATETIME
+      </div>
+    </div>
+  </div>
+
+  <div class="caption">Fig 6.1 – Entity-Relationship (ER) Diagram of KR Accounts ERP (Black & White)</div>
+</div>
+
+</body>
+</html>
