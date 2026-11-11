@@ -826,3 +826,52 @@ export function computeBalanceSheet(asOfDateStr) {
     unbalancedAmount: Math.abs(totalLiabilities - totalAssets)
   };
 }
+
+export async function refreshDBState() {
+  try {
+    const data = await apiCall("/db", "GET");
+    if (data && typeof data === "object") {
+      dbState = { ...dbState, ...data };
+      dbState.users = dbState.users || [];
+      notifyDB();
+    }
+  } catch (err) {
+    console.error("Could not refresh DB state:", err);
+  }
+}
+
+// External Sales Invoices Integration APIs
+export async function getExternalInvoices(filters = {}) {
+  const queryParams = new URLSearchParams();
+  if (filters.page) queryParams.append("page", filters.page);
+  if (filters.limit) queryParams.append("limit", filters.limit);
+  if (filters.startDate) queryParams.append("startDate", filters.startDate);
+  if (filters.endDate) queryParams.append("endDate", filters.endDate);
+  if (filters.invoiceNo) queryParams.append("invoiceNo", filters.invoiceNo);
+  if (filters.supplierId) queryParams.append("supplierId", filters.supplierId);
+
+  const queryStr = queryParams.toString() ? `?${queryParams.toString()}` : "";
+  const res = await apiCall(`/external/invoices${queryStr}`, "GET");
+  return res || { invoices: [], summary: { total: 0, posted: 0, pending: 0 } };
+}
+
+export async function syncExternalInvoice(invoiceOrId) {
+  const res = await apiCall("/external/invoices/sync", "POST", {
+    invoice: invoiceOrId,
+    user: dbState.currentUser || "Admin"
+  });
+
+  // Re-fetch local state so accounts and vouchers update instantly in UI
+  await refreshDBState();
+  return res;
+}
+
+export async function syncAllExternalInvoices() {
+  const res = await apiCall("/external/invoices/sync-all", "POST", {
+    user: dbState.currentUser || "Admin"
+  });
+
+  // Re-fetch local state
+  await refreshDBState();
+  return res;
+}

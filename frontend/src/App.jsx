@@ -14,6 +14,7 @@ import BankPayment from './components/vouchers/BankPayment';
 import BankReceipt from './components/vouchers/BankReceipt';
 import DebitNote from "./components/vouchers/DebitNote";
 import CreditNote from "./components/vouchers/CreditNote";
+import ExternalInvoiceSync from "./components/sales/ExternalInvoiceSync";
 
 import { 
   getDB, 
@@ -1061,6 +1062,23 @@ export default function App() {
             <div className="flex-1 overflow-hidden flex flex-col min-h-0" id="cn-entry-tab">
               <PageHeader category="Vouchers" title="Credit Note Register" description="Record Credit Notes for sales returns and discount adjustments." />
               <CreditNote database={db} onSaveVoucher={handleSaveVoucher} onDeleteVoucher={deleteVoucher} onPrint={triggerPrintModal} />
+            </div>
+          )}
+
+          {/* TAB: EXTERNAL INVOICE SYNC */}
+          {activeTab === "external-invoices" && (
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0" id="external-invoices-tab">
+              <PageHeader 
+                category="Integrations" 
+                title="Sales Invoices Sync & Automation" 
+                description="Fetch invoices from Raw Material / Sales ERP, verify buyer ledgers, and automatically post double-entry Journal Vouchers." 
+              />
+              <ExternalInvoiceSync 
+                database={db}
+                onNavigateToVoucher={() => {
+                  setActiveTab("journal-voucher");
+                }}
+              />
             </div>
           )}
 
