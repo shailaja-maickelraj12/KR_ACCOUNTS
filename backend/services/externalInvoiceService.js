@@ -1,11 +1,16 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import { Account, Voucher, VoucherItem, Group, SubGroup, AuditLog } from "../models/index.js";
 import { saveVoucher } from "./voucherService.js";
 
-dotenv.config({ quiet: true });
+// Ensure SSL/TLS negotiation works cleanly with local tunnels and proxies
+if (!process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
-const EXTERNAL_API_URL = process.env.EXTERNAL_INVOICE_API_URL || "https://krexports.org/api/v1/external/invoices";
-const EXTERNAL_API_KEY = process.env.EXTERNAL_INVOICE_API_KEY || "sales_module_secret_key_2026";
+const getApiConfig = () => ({
+  url: process.env.EXTERNAL_INVOICE_API_URL || "https://loni-vegetal-corrin.ngrok-free.dev/api/v1/external/invoices",
+  key: process.env.EXTERNAL_INVOICE_API_KEY || "sales_module_secret_key_2026"
+});
 
 // Sample fallback invoices for local development / offline demo matching the exact API schema
 const SAMPLE_INVOICES = [
@@ -147,8 +152,9 @@ const SAMPLE_INVOICES = [
  * Fetch list of invoices from the external Sales Module API (with fallback if offline)
  */
 export const fetchExternalInvoices = async ({ page = 1, limit = 50, startDate, endDate, invoiceNo, supplierId } = {}) => {
+  const config = getApiConfig();
   try {
-    const url = new URL(EXTERNAL_API_URL);
+    const url = new URL(config.url);
     url.searchParams.append("page", String(page));
     url.searchParams.append("limit", String(limit));
     if (startDate) url.searchParams.append("startDate", startDate);
@@ -157,12 +163,13 @@ export const fetchExternalInvoices = async ({ page = 1, limit = 50, startDate, e
     if (supplierId) url.searchParams.append("supplierId", String(supplierId));
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
-        "X-API-KEY": EXTERNAL_API_KEY,
+        "X-API-KEY": config.key,
+        "ngrok-skip-browser-warning": "true",
         "Content-Type": "application/json"
       },
       signal: controller.signal
@@ -178,7 +185,7 @@ export const fetchExternalInvoices = async ({ page = 1, limit = 50, startDate, e
     const data = await response.json();
     return data;
   } catch (error) {
-    console.warn(`[External Invoice API] Network call to ${EXTERNAL_API_URL} failed (${error.message}). Using local fallback/cached dataset.`);
+    console.warn(`[External Invoice API] Network call to ${config.url} failed (${error.message}). Using local fallback/cached dataset.`);
     let filtered = [...SAMPLE_INVOICES];
     if (invoiceNo) {
       filtered = filtered.filter(i => String(i.invoiceNo).includes(String(invoiceNo)));
@@ -204,15 +211,17 @@ export const fetchExternalInvoices = async ({ page = 1, limit = 50, startDate, e
  * Fetch a single invoice by ID from the external Sales Module API (with fallback if offline)
  */
 export const fetchSingleExternalInvoice = async (id) => {
+  const config = getApiConfig();
   try {
-    const url = `${EXTERNAL_API_URL.replace(/\/$/, "")}/${id}`;
+    const url = `${config.url.replace(/\/$/, "")}/${id}`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "X-API-KEY": EXTERNAL_API_KEY,
+        "X-API-KEY": config.key,
+        "ngrok-skip-browser-warning": "true",
         "Content-Type": "application/json"
       },
       signal: controller.signal
@@ -228,7 +237,7 @@ export const fetchSingleExternalInvoice = async (id) => {
     const data = await response.json();
     return data.invoice || data.data;
   } catch (error) {
-    console.warn(`[External Invoice API] Network call to ${EXTERNAL_API_URL}/${id} failed (${error.message}). Checking sample dataset.`);
+    console.warn(`[External Invoice API] Network call to ${config.url}/${id} failed (${error.message}). Checking sample dataset.`);
     const found = SAMPLE_INVOICES.find(i => String(i.id) === String(id) || String(i.invoiceNo) === String(id));
     if (found) return found;
     throw new Error(`Invoice '${id}' not found in external sales system.`);
@@ -336,12 +345,16 @@ export const getInvoicesWithSyncStatus = async (filters = {}) => {
 
   const postedMap = new Map();
   for (const v of allVouchers) {
-    const payload = v.payload || {};
-    if (payload.externalInvoiceNo) {
-      postedMap.set(String(payload.externalInvoiceNo), v);
+    const rawPayload = typeof v.payload === "string" ? JSON.parse(v.payload) : (v.payload || {});
+    const innerPayload = rawPayload.payload || {};
+    const extNo = rawPayload.externalInvoiceNo || innerPayload.externalInvoiceNo;
+    const extId = rawPayload.externalInvoiceId || innerPayload.externalInvoiceId;
+
+    if (extNo) {
+      postedMap.set(String(extNo), v);
     }
-    if (payload.externalInvoiceId) {
-      postedMap.set(String(payload.externalInvoiceId), v);
+    if (extId) {
+      postedMap.set(String(extId), v);
     }
     if (v.voucherNo && v.voucherNo.startsWith("JV-INV-")) {
       const invNum = v.voucherNo.replace("JV-INV-", "");
@@ -403,10 +416,14 @@ export const syncInvoiceToJournalVoucher = async (invoiceInput, currentUser = "S
   // 1. Check if already posted to prevent duplicate entries
   const existingVouchers = await Voucher.findAll();
   for (const v of existingVouchers) {
-    const payload = v.payload || {};
+    const rawPayload = typeof v.payload === "string" ? JSON.parse(v.payload) : (v.payload || {});
+    const innerPayload = rawPayload.payload || {};
+    const extNo = rawPayload.externalInvoiceNo || innerPayload.externalInvoiceNo;
+    const extId = rawPayload.externalInvoiceId || innerPayload.externalInvoiceId;
+
     if (
-      String(payload.externalInvoiceNo) === String(invoice.invoiceNo) ||
-      String(payload.externalInvoiceId) === String(invoice.id) ||
+      (extNo && String(extNo) === String(invoice.invoiceNo)) ||
+      (extId && String(extId) === String(invoice.id)) ||
       v.voucherNo === `JV-INV-${invoice.invoiceNo}`
     ) {
       return {
@@ -593,7 +610,7 @@ export const syncInvoiceToJournalVoucher = async (invoiceInput, currentUser = "S
 };
 
 /**
- * Sync multiple pending invoices in batch
+ * Sync multiple pending invoices in batch (High Performance)
  */
 export const syncAllPendingInvoices = async (currentUser = "System Batch Sync") => {
   const { invoices } = await getInvoicesWithSyncStatus({ limit: 100 });
@@ -607,11 +624,189 @@ export const syncAllPendingInvoices = async (currentUser = "System Batch Sync") 
     errors: []
   };
 
+  if (pendingInvoices.length === 0) {
+    return results;
+  }
+
+  // Pre-fetch all shared ledger accounts once
+  const salesAccount = await findOrCreateLedgerAccount({
+    name: "Waste Sales Account",
+    subGroupName: "Sales Account",
+    groupName: "Direct Incomes",
+    mainGroupName: "Incomes"
+  });
+
+  const gstAccount = await findOrCreateLedgerAccount({
+    name: "Output GST Account",
+    subGroupName: "Duties & Taxes",
+    groupName: "Current Liabilities",
+    mainGroupName: "Liabilities"
+  });
+
+  const tcsAccount = await findOrCreateLedgerAccount({
+    name: "TCS on Sales Account",
+    subGroupName: "Duties & Taxes",
+    groupName: "Current Liabilities",
+    mainGroupName: "Liabilities"
+  });
+
+  const roundOffAccount = await findOrCreateLedgerAccount({
+    name: "Round Off Account",
+    subGroupName: "Indirect Expenses",
+    groupName: "Expenses",
+    mainGroupName: "Expenses"
+  });
+
+  // Calculate starting max sequence number once
+  const allVouchers = await Voucher.findAll();
+  let currentSeq = 0;
+  for (const v of allVouchers) {
+    if (v.type === "JV" || v.type === "JOURNAL" || v.type === "Journal") {
+      const match = String(v.voucherNo || "").match(/^JV-(\d+)$/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > currentSeq) currentSeq = num;
+      } else if (/^\d+$/.test(String(v.voucherNo || ""))) {
+        const num = parseInt(v.voucherNo, 10);
+        if (num > currentSeq) currentSeq = num;
+      }
+    }
+  }
+
+  // Pre-load all accounts for instant memory-lookup
+  const allAccounts = await Account.findAll();
+  const accountMap = new Map();
+  allAccounts.forEach(a => accountMap.set(a.name.trim().toUpperCase(), a.toJSON()));
+
+  let maxAccountCode = 60000000;
+  for (const a of allAccounts) {
+    const raw = String(a.code || "").trim();
+    if (/^\d{8}$/.test(raw)) {
+      const n = parseInt(raw, 10);
+      if (n >= 60000001 && n > maxAccountCode) maxAccountCode = n;
+    }
+  }
+
   for (const inv of pendingInvoices) {
     try {
-      const res = await syncInvoiceToJournalVoucher(inv, currentUser);
+      const buyerName = (inv.buyer?.accountName || `BUYER-${inv.buyer?.supplierId || "UNKNOWN"}`).trim();
+      let buyerAcc = accountMap.get(buyerName.toUpperCase());
+
+      if (!buyerAcc) {
+        maxAccountCode++;
+        const newCode = String(maxAccountCode);
+        const newBuyerAccount = {
+          code: newCode,
+          name: buyerName,
+          groupName: "Current Assets",
+          subGroupName: "Sundry Debtors",
+          mainGroupName: "Assets",
+          place: inv.buyer?.address2 || inv.buyer?.address1 || "",
+          address1: inv.buyer?.address1 || "",
+          address2: inv.buyer?.address2 || "",
+          gstNo: inv.buyer?.gstin || "",
+          cellNo: inv.buyer?.mobileNo || "",
+          phoneNo: inv.buyer?.mobileNo || "",
+          openingDebit: 0,
+          openingCredit: 0,
+          externalSupplierId: inv.buyer?.supplierId
+        };
+        await Account.create({ ...newBuyerAccount, payload: newBuyerAccount });
+        buyerAcc = newBuyerAccount;
+        accountMap.set(buyerName.toUpperCase(), buyerAcc);
+      }
+
+      // Financials
+      const fin = inv.financials || {};
+      const invoiceValue = parseFloat(fin.invoiceValue) || 0;
+      const assessableValue = parseFloat(fin.assessableValue) || (parseFloat(fin.subTotal) || 0);
+      const gstAmount = parseFloat(fin.gstAmount || fin.igstAmount) || 0;
+      const tcsAmount = parseFloat(fin.tcsRs) || 0;
+      const roundOff = parseFloat(fin.roundOff) || 0;
+
+      const voucherItems = [];
+      voucherItems.push({
+        accountCode: buyerAcc.code,
+        accountName: buyerAcc.name,
+        debit: invoiceValue,
+        credit: 0,
+        narration: `Inv #${inv.invoiceNo} - Total receivable from ${buyerAcc.name}`
+      });
+
+      if (assessableValue > 0) {
+        voucherItems.push({
+          accountCode: salesAccount.code,
+          accountName: salesAccount.name,
+          debit: 0,
+          credit: assessableValue,
+          narration: `Inv #${inv.invoiceNo} - Waste Sales assessable value`
+        });
+      }
+
+      if (gstAmount > 0) {
+        voucherItems.push({
+          accountCode: gstAccount.code,
+          accountName: gstAccount.name,
+          debit: 0,
+          credit: gstAmount,
+          narration: `Inv #${inv.invoiceNo} - Output GST liability`
+        });
+      }
+
+      if (tcsAmount > 0) {
+        voucherItems.push({
+          accountCode: tcsAccount.code,
+          accountName: tcsAccount.name,
+          debit: 0,
+          credit: tcsAmount,
+          narration: `Inv #${inv.invoiceNo} - TCS collected on sales`
+        });
+      }
+
+      if (roundOff !== 0) {
+        voucherItems.push({
+          accountCode: roundOffAccount.code,
+          accountName: roundOffAccount.name,
+          debit: roundOff < 0 ? Math.abs(roundOff) : 0,
+          credit: roundOff > 0 ? roundOff : 0,
+          narration: `Inv #${inv.invoiceNo} - Round Off adjustment`
+        });
+      }
+
+      currentSeq++;
+      const voucherNo = `JV-${String(currentSeq).padStart(5, "0")}`;
+      const voucherId = `V_EXT_${inv.id || inv.invoiceNo}_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+      const dispatch = inv.dispatchDetails || {};
+      const narration = `GST Waste Sale Inv #${inv.invoiceNo} to ${buyerAcc.name} | Vehicle: ${dispatch.vehicleNo || "N/A"} | LR: ${dispatch.lrNo || "N/A"} | E-Way: ${dispatch.ewayBillNo || "N/A"}`;
+
+      const voucherData = {
+        id: voucherId,
+        voucherNo,
+        voucherDate: inv.invoiceDate || new Date().toISOString().split("T")[0],
+        type: "JV",
+        shortDesc: "WASTE SALE",
+        narration,
+        totalAmount: invoiceValue,
+        userName: currentUser,
+        items: voucherItems,
+        payload: {
+          externalInvoiceId: inv.id,
+          externalInvoiceNo: inv.invoiceNo,
+          shortDesc: "WASTE SALE",
+          invoiceType: inv.invoiceType,
+          buyer: inv.buyer,
+          dispatchDetails: dispatch,
+          financials: fin,
+          salesOrder: inv.salesOrder,
+          items: inv.items,
+          summary: inv.summary,
+          syncedAt: new Date().toISOString()
+        }
+      };
+
+      await saveVoucher(voucherData);
       results.successCount++;
-      results.synced.push({ invoiceNo: inv.invoiceNo, voucherNo: res.voucher?.voucherNo });
+      results.synced.push({ invoiceNo: inv.invoiceNo, voucherNo });
     } catch (err) {
       results.failedCount++;
       results.errors.push({ invoiceNo: inv.invoiceNo, error: err.message });

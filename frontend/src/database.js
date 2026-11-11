@@ -45,10 +45,15 @@ async function apiCall(url, method = "POST", body = null) {
     if (body) options.body = JSON.stringify(body);
     
     const res = await fetch(`${BASE_URL}${url}`, options);
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.message || `HTTP ${res.status}: ${res.statusText}`);
+    }
     const result = await res.json();
     return result;
   } catch (error) {
     console.error(`[API Error] ${url}:`, error);
+    throw error;
   }
 }
 
