@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+// Using Node 18+ native global fetch
 
 const API_URL = "http://localhost:6400/ams/external/invoices/webhook";
 const API_KEY = "sales_module_secret_key_2026";
@@ -57,17 +57,20 @@ async function testInvoiceWebhook() {
       body: JSON.stringify(sampleInvoicePayload)
     });
 
-    const result = await response.json();
-    console.log(`Status Code: ${response.status}`);
-    console.log("Response Payload:", JSON.stringify(result, null, 2));
+    const status = response.status;
+    const data = await response.json();
 
-    if (result.success) {
-      console.log("✅ SUCCESS: Invoice transformed and saved as Journal Voucher!");
+    console.log(`Status Code: ${status}`);
+    console.log("Response:", JSON.stringify(data, null, 2));
+
+    if (response.ok && data.success) {
+      console.log("\n🎉 Webhook processing test PASSED successfully!");
+      console.log(`Created JV Voucher ID: ${data.voucher?.id || data.voucherNo}`);
     } else {
-      console.error("❌ FAILED:", result.message);
+      console.error("\n❌ Webhook processing test FAILED:", data.message || "Unknown error");
     }
   } catch (error) {
-    console.error("❌ Error running test:", error.message);
+    console.error("\n❌ Request failed:", error.message);
   }
 }
 
